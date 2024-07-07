@@ -1,5 +1,6 @@
 from pydantic import BaseModel
+from bookshelf.domain.author import AuthorCore
 
 
-class CreateAuthorRequest(BaseModel):
-    name: str
+class CreateAuthorRequest(AuthorCore):
+    pass
