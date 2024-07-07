@@ -1,11 +1,7 @@
-from http import HTTPStatus
-
 from fastapi import FastAPI
-from fastapi.responses import Response
+
+from bookshelf.api.routers import healthcheck_router
 
 app = FastAPI()
 
-
-@app.get("/health", status_code=HTTPStatus.NO_CONTENT.value)
-def health_check():
-    return Response(status_code=HTTPStatus.NO_CONTENT)
+app.include_router(healthcheck_router)
