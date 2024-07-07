@@ -6,6 +6,6 @@ from fastapi.responses import Response
 app = FastAPI()
 
 
-@app.get("/health")
+@app.get("/health", status_code=HTTPStatus.NO_CONTENT.value)
 def health_check():
     return Response(status_code=HTTPStatus.NO_CONTENT)
