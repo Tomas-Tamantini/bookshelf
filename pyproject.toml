@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "bookshelf"
+version = "0.1.0"
+description = "An API to manage your favorite books."
+authors = ["Tomas Tamantini <tomasbft@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.12.*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
