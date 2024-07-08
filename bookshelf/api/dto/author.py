@@ -1,5 +1,5 @@
-from bookshelf.domain.author import AuthorCore
 from bookshelf.api.dto.sanitize import sanitize_name
+from bookshelf.domain.author import AuthorCore
 
 
 class CreateAuthorRequest(AuthorCore):

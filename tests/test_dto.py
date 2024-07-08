@@ -1,5 +1,6 @@
-from bookshelf.api.dto.sanitize import sanitize_name
 import pytest
+
+from bookshelf.api.dto.sanitize import sanitize_name
 
 
 @pytest.mark.parametrize(
