@@ -1,9 +1,14 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from bookshelf.api.dependencies import T_AuthorRepository
-from bookshelf.api.dto import CreateAuthorRequest, Message
+from bookshelf.api.dto import (
+    CreateAuthorRequest,
+    GetAuthorsQueryParameters,
+    GetAuthorsResponse,
+    Message,
+)
 from bookshelf.domain.author import Author
 
 authors_router = APIRouter(prefix="/authors", tags=["authors"])
@@ -54,3 +59,16 @@ def get_author(author_id: int, author_repository: T_AuthorRepository):
     if author is None:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     return author
+
+
+@authors_router.get("/", status_code=HTTPStatus.OK, response_model=GetAuthorsResponse)
+def get_authors(
+    author_repository: T_AuthorRepository,
+    query_parameters: GetAuthorsQueryParameters = Depends(),
+):
+    db_response = author_repository.get_filtered(query_parameters.sanitized())
+    return GetAuthorsResponse(
+        limit=query_parameters.limit,
+        offset=query_parameters.offset,
+        **db_response.model_dump()
+    )

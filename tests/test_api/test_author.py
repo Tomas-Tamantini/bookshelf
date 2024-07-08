@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from bookshelf.api.dto import GetAuthorsResponse
+
 
 def test_creating_author_with_missing_fields_returns_unprocessable_entity(client):
     response = client.post("/authors", json={})
@@ -125,3 +127,28 @@ def test_getting_author_with_nonexistent_id_returns_not_found(
     mock_author_repository.get_by_id.return_value = None
     response = client.get("/authors/123")
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_getting_authors_by_name_returns_status_ok(client):
+    response = client.get("/authors?name=Andrew")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_getting_authors_by_name_sanitizes_name_before_querying_database(
+    client, mock_author_repository
+):
+    client.get("/authors?name=AnDrEw")
+    assert mock_author_repository.get_filtered.call_args[0][0].name == "andrew"
+
+
+def test_getting_authors_returns_matching_authors(
+    client, mock_author_repository, get_authors_db_response
+):
+    mock_author_repository.get_filtered.return_value = get_authors_db_response
+    api_response = client.get("/authors?name=Andrew&limit=10&offset=20")
+    assert (
+        api_response.json()
+        == GetAuthorsResponse(
+            limit=10, offset=20, **get_authors_db_response.model_dump()
+        ).model_dump()
+    )

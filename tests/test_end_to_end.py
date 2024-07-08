@@ -3,6 +3,10 @@ from http import HTTPStatus
 import pytest
 
 
+def _post_author(client, name):
+    return client.post("/authors/", json={"name": name})
+
+
 @pytest.mark.end_to_end
 def test_author_crud(end_to_end_client):
     # Create
@@ -21,3 +25,23 @@ def test_author_crud(end_to_end_client):
     response = end_to_end_client.delete("/authors/1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "Author deleted"}
+    # Get by query parameters
+    names = (
+        "Clarice Lispector",
+        "Machado de Assis",
+        "Robert C.  martin",
+        "Mary Shelley",
+    )
+    for name in names:
+        _post_author(end_to_end_client, name)
+    response = end_to_end_client.get("/authors?name=Ma&limit=2&offset=1")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        "limit": 2,
+        "offset": 1,
+        "total": 3,
+        "authors": [
+            {"id": 3, "name": "robert c martin"},
+            {"id": 4, "name": "mary shelley"},
+        ],
+    }
