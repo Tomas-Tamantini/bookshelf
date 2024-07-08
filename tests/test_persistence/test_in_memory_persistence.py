@@ -38,3 +38,10 @@ def test_in_memory_author_repository_updates_author():
     assert updated_author == Author(id=author.id, name="Updated")
     assert repository.name_exists("Updated")
     assert not repository.name_exists("Original")
+
+
+def test_in_memory_author_repository_gets_author_by_id():
+    repository = InMemoryAuthorRepository()
+    author = repository.add(AuthorCore(name="Author 1"))
+    assert repository.get_by_id(author.id) == author
+    assert repository.get_by_id(123) is None

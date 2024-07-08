@@ -94,3 +94,22 @@ def test_updating_author_with_existing_name_returns_conflict(client, author_repo
     response = client.put("/authors/123", json={"name": "existing name"})
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json() == {"detail": "Author with this name already exists"}
+
+
+def test_getting_author_by_id_returns_status_ok(client):
+    response = client.get("/authors/123")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_getting_existing_author_returns_author(client, author_repo_mock):
+    author = {"id": 123, "name": "Existing name"}
+    author_repo_mock.get_by_id.return_value = author
+
+    response = client.get("/authors/123")
+    assert response.json() == author
+
+
+def test_getting_author_with_nonexistent_id_returns_not_found(client, author_repo_mock):
+    author_repo_mock.get_by_id.return_value = None
+    response = client.get("/authors/123")
+    assert response.status_code == HTTPStatus.NOT_FOUND

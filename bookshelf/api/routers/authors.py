@@ -46,3 +46,11 @@ def update_author(
         )
     else:
         return author_repository.update(author_id, author.sanitized())
+
+
+@authors_router.get("/{author_id}", response_model=Author)
+def get_author(author_id: int, author_repository: T_AuthorRepository):
+    author = author_repository.get_by_id(author_id)
+    if author is None:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+    return author

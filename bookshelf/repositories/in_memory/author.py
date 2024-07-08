@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bookshelf.domain.author import Author, AuthorCore
 
 
@@ -25,3 +27,8 @@ class InMemoryAuthorRepository:
             updated if author.id == author_id else author for author in self._authors
         ]
         return updated
+
+    def get_by_id(self, author_id: int) -> Optional[Author]:
+        return next(
+            (author for author in self._authors if author.id == author_id), None
+        )

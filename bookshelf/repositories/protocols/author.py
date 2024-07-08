@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Optional, Protocol
 
 from bookshelf.domain.author import Author, AuthorCore
 
@@ -13,3 +13,5 @@ class AuthorRepository(Protocol):
     def delete(self, author_id: int) -> None: ...
 
     def update(self, author_id: int, author: AuthorCore) -> Author: ...
+
+    def get_by_id(self, author_id: int) -> Optional[Author]: ...
