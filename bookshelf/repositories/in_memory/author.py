@@ -12,3 +12,9 @@ class InMemoryAuthorRepository:
 
     def name_exists(self, name: str) -> bool:
         return any(author.name == name for author in self._authors)
+
+    def id_exists(self, author_id: int) -> bool:
+        return any(author.id == author_id for author in self._authors)
+
+    def delete(self, author_id: int) -> None:
+        self._authors = [author for author in self._authors if author.id != author_id]

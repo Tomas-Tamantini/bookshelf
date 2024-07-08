@@ -15,3 +15,17 @@ def test_in_memory_author_repository_keeps_track_of_existing_names():
     repository.add(AuthorCore(name="Author 1"))
     assert repository.name_exists("Author 1")
     assert not repository.name_exists("Author 2")
+
+
+def test_in_memory_author_repository_keeps_track_of_ids():
+    repository = InMemoryAuthorRepository()
+    repository.add(AuthorCore(name="Author 1"))
+    assert repository.id_exists(1)
+    assert not repository.id_exists(2)
+
+
+def test_in_memory_author_repository_deletes_author():
+    repository = InMemoryAuthorRepository()
+    author = repository.add(AuthorCore(name="Author 1"))
+    repository.delete(author.id)
+    assert not repository.id_exists(author.id)
