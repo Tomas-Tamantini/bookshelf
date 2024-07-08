@@ -7,9 +7,9 @@ from bookshelf.repositories.in_memory import InMemoryAuthorRepository
 
 
 @pytest.fixture
-def client(author_repo_mock):
+def client(mock_author_repository):
     with TestClient(app) as client:
-        app.dependency_overrides[get_author_repository] = lambda: author_repo_mock
+        app.dependency_overrides[get_author_repository] = lambda: mock_author_repository
         yield client
         app.dependency_overrides.clear()
 

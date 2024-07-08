@@ -6,7 +6,7 @@ from bookshelf.repositories.protocols import AuthorRepository
 
 
 @pytest.fixture
-def author_repo_mock(author):
+def mock_author_repository(author):
     repo = Mock(spec=AuthorRepository)
     repo.add.return_value = author
     repo.get_by_id.return_value = author
