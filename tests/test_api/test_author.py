@@ -28,3 +28,11 @@ def test_creating_valid_author_returns_author_with_id_given_by_repository(
 def test_author_name_gets_sanitized_before_being_stored(client, author_repo_mock):
     client.post("/authors", json={"name": "  Andrew   Hunt  "})
     assert author_repo_mock.add.call_args[0][0].name == "andrew hunt"
+
+
+def test_creating_author_with_existing_name_returns_conflict(client, author_repo_mock):
+    author_repo_mock.name_exists.return_value = True
+
+    response = client.post("/authors", json={"name": "Andrew Hunt"})
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {"detail": "Author with this name already exists"}

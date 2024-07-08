@@ -9,4 +9,5 @@ from bookshelf.repositories.protocols import AuthorRepository
 def author_repo_mock(author):
     repo = Mock(spec=AuthorRepository)
     repo.add.return_value = author
+    repo.name_exists.return_value = False
     return repo

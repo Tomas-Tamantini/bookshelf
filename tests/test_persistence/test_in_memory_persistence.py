@@ -8,3 +8,10 @@ def test_adding_author_in_memory_increments_id():
     assert auth_1 == Author(id=1, name="Author 1")
     auth_2 = repository.add(AuthorCore(name="Author 2"))
     assert auth_2 == Author(id=2, name="Author 2")
+
+
+def test_in_memory_author_repository_keeps_track_of_existing_names():
+    repository = InMemoryAuthorRepository()
+    repository.add(AuthorCore(name="Author 1"))
+    assert repository.name_exists("Author 1")
+    assert not repository.name_exists("Author 2")
