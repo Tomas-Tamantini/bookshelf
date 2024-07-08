@@ -1,6 +1,7 @@
 from typing import Optional, Protocol
 
 from bookshelf.domain.author import Author, AuthorCore
+from bookshelf.repositories.dto import GetAuthorsDBQueryParameters, GetAuthorsDBResponse
 
 
 class AuthorRepository(Protocol):
@@ -15,3 +16,7 @@ class AuthorRepository(Protocol):
     def update(self, author_id: int, author: AuthorCore) -> Author: ...
 
     def get_by_id(self, author_id: int) -> Optional[Author]: ...
+
+    def get_filtered(
+        self, query_parameters: GetAuthorsDBQueryParameters
+    ) -> GetAuthorsDBResponse: ...

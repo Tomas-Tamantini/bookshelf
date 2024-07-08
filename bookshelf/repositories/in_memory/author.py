@@ -1,6 +1,7 @@
 from typing import Optional
 
 from bookshelf.domain.author import Author, AuthorCore
+from bookshelf.repositories.dto import GetAuthorsDBQueryParameters, GetAuthorsDBResponse
 
 
 class InMemoryAuthorRepository:
@@ -31,4 +32,16 @@ class InMemoryAuthorRepository:
     def get_by_id(self, author_id: int) -> Optional[Author]:
         return next(
             (author for author in self._authors if author.id == author_id), None
+        )
+
+    def get_filtered(
+        self, query_parameters: GetAuthorsDBQueryParameters
+    ) -> GetAuthorsDBResponse:
+        filtered = [
+            author for author in self._authors if query_parameters.name in author.name
+        ]
+        start_idx = query_parameters.offset
+        end_idx = start_idx + query_parameters.limit
+        return GetAuthorsDBResponse(
+            authors=filtered[start_idx:end_idx], total=len(filtered)
         )

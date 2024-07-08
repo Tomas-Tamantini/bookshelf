@@ -1,5 +1,7 @@
 import pytest
+
 from bookshelf.domain.author import Author, AuthorCore
+from bookshelf.repositories.dto import GetAuthorsDBQueryParameters
 from bookshelf.repositories.in_memory import InMemoryAuthorRepository
 
 
@@ -45,3 +47,14 @@ def test_in_memory_author_repository_gets_author_by_id(author_repo):
     author = author_repo.add(AuthorCore(name="Author 1"))
     assert author_repo.get_by_id(author.id) == author
     assert author_repo.get_by_id(123) is None
+
+
+def test_in_memory_author_repository_gets_filtered_and_paginated_authors(author_repo):
+    names = ("abc", "aab", "bba", "ccc", "cab")
+    for name in names:
+        author_repo.add(AuthorCore(name=name))
+    resullt = author_repo.get_filtered(
+        GetAuthorsDBQueryParameters(name="ab", limit=2, offset=1)
+    )
+    assert resullt.total == 3
+    assert resullt.authors == [Author(id=2, name="aab"), Author(id=5, name="cab")]
