@@ -11,4 +11,4 @@ authors_router = APIRouter(prefix="/authors", tags=["authors"])
 
 @authors_router.post("/", status_code=HTTPStatus.OK.value, response_model=Author)
 def create_author(author: CreateAuthorRequest, author_repository: T_AuthorRepository):
-    return author_repository.add(author)
+    return author_repository.add(author.sanitized())
