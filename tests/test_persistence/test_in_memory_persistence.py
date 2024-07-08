@@ -29,3 +29,12 @@ def test_in_memory_author_repository_deletes_author():
     author = repository.add(AuthorCore(name="Author 1"))
     repository.delete(author.id)
     assert not repository.id_exists(author.id)
+
+
+def test_in_memory_author_repository_updates_author():
+    repository = InMemoryAuthorRepository()
+    author = repository.add(AuthorCore(name="Original"))
+    updated_author = repository.update(author.id, AuthorCore(name="Updated"))
+    assert updated_author == Author(id=author.id, name="Updated")
+    assert repository.name_exists("Updated")
+    assert not repository.name_exists("Original")

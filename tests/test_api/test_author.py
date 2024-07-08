@@ -18,10 +18,7 @@ def test_creating_valid_author_returns_author_with_id_given_by_repository(
 
     author_repo_mock.add.return_value = stored_author
 
-    response = client.post(
-        "/authors",
-        json={"name": "Andrew Hunt"},
-    )
+    response = client.post("/authors", json={"name": "Andrew Hunt"})
     assert response.json() == stored_author
 
 
@@ -59,3 +56,41 @@ def test_deleting_author_with_nonexistent_id_returns_not_found(
     author_repo_mock.id_exists.return_value = False
     response = client.delete("/authors/123")
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_updating_author_with_missing_fields_returns_unprocessable_entity(client):
+    response = client.put("/authors/123", json={})
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+def test_updating_existing_author_returns_status_ok(client):
+    response = client.put("/authors/123", json={"name": "New name"})
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_updating_existing_author_returns_updated_author(client, author_repo_mock):
+    updated = {"id": 123, "name": "New name"}
+    author_repo_mock.update.return_value = updated
+    response = client.put("/authors/123", json={"name": "New name"})
+    assert response.json() == updated
+
+
+def test_author_name_gets_sanitized_before_being_updated(client, author_repo_mock):
+    client.put("/authors/123", json={"name": "  New   Name  "})
+    assert author_repo_mock.update.call_args[0][1].name == "new name"
+
+
+def test_updating_author_with_nonexistent_id_returns_not_found(
+    client, author_repo_mock
+):
+    author_repo_mock.id_exists.return_value = False
+    response = client.put("/authors/123", json={"name": "New name"})
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_updating_author_with_existing_name_returns_conflict(client, author_repo_mock):
+    author_repo_mock.name_exists.return_value = True
+
+    response = client.put("/authors/123", json={"name": "existing name"})
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {"detail": "Author with this name already exists"}

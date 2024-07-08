@@ -18,3 +18,10 @@ class InMemoryAuthorRepository:
 
     def delete(self, author_id: int) -> None:
         self._authors = [author for author in self._authors if author.id != author_id]
+
+    def update(self, author_id: int, updated: AuthorCore) -> Author:
+        updated = Author(id=author_id, **updated.model_dump())
+        self._authors = [
+            updated if author.id == author_id else author for author in self._authors
+        ]
+        return updated

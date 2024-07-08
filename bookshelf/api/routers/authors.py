@@ -29,3 +29,20 @@ def delete_author(author_id: int, author_repository: T_AuthorRepository):
     else:
         author_repository.delete(author_id)
         return Message(message="Author deleted")
+
+
+@authors_router.put(
+    "/{author_id}", status_code=HTTPStatus.OK.value, response_model=Author
+)
+def update_author(
+    author_id: int, author: CreateAuthorRequest, author_repository: T_AuthorRepository
+):
+    if not author_repository.id_exists(author_id):
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+    elif author_repository.name_exists(author.name):
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT,
+            detail="Author with this name already exists",
+        )
+    else:
+        return author_repository.update(author_id, author.sanitized())
