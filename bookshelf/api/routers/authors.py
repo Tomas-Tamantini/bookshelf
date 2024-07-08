@@ -9,7 +9,7 @@ from bookshelf.domain.author import Author
 authors_router = APIRouter(prefix="/authors", tags=["authors"])
 
 
-@authors_router.post("/", status_code=HTTPStatus.OK.value, response_model=Author)
+@authors_router.post("/", status_code=HTTPStatus.CREATED.value, response_model=Author)
 def create_author(author: CreateAuthorRequest, author_repository: T_AuthorRepository):
     if author_repository.name_exists(author.name):
         raise HTTPException(

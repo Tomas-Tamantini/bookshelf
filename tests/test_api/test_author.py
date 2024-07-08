@@ -6,9 +6,9 @@ def test_creating_author_with_missing_fields_returns_unprocessable_entity(client
     assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-def test_creating_valid_author_returns_status_ok(client):
+def test_creating_valid_author_returns_status_created(client):
     response = client.post("/authors", json={"name": "Andrew Hunt"})
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == HTTPStatus.CREATED
 
 
 def test_creating_valid_author_returns_author_with_id_given_by_repository(
