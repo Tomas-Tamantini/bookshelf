@@ -45,3 +45,22 @@ def test_author_crud(end_to_end_client):
             {"id": 4, "name": "mary shelley"},
         ],
     }
+
+
+@pytest.mark.end_to_end
+def test_book_crud(end_to_end_client):
+    # Prerequisite: Create author
+    author = end_to_end_client.post("/authors/", json={"name": "Andrew Hunt"})
+    author_id = author.json()["id"]
+    # Create
+    response = end_to_end_client.post(
+        "/books/",
+        json={"title": "The Pragmatic Programmer", "year": 1999, "author_id": 1},
+    )
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json() == {
+        "id": 1,
+        "title": "the pragmatic programmer",
+        "year": 1999,
+        "author_id": author_id,
+    }
