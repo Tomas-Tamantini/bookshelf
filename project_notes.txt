@@ -9,7 +9,7 @@ Project decisions:
 
 
     - A LOT of dependency injection (Authentication, authorization, repositories, etc.), making most tests very fast
-    - Explicitely marking the integration and end-to-end tests
+    - Explicitely marking the integration and end-to-end tests. End-to-end tests only test the happy paths
     - Grouping the query parameters into one pydantic object, rather than using fastapi's Query object. Example:
 
         
