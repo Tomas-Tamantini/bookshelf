@@ -34,3 +34,16 @@ def test_book_name_gets_sanitized_beofre_being_stored(client, mock_book_reposito
         json={"title": "  The   Pragmatic Programmer  ", "year": 1999, "author_id": 1},
     )
     assert mock_book_repository.add.call_args[0][0].title == "the pragmatic programmer"
+
+
+def test_creating_book_with_existing_title_returns_conflict(
+    client, mock_book_repository
+):
+    mock_book_repository.title_exists.return_value = True
+
+    response = client.post(
+        "/books",
+        json={"title": "The Pragmatic Programmer", "year": 1999, "author_id": 1},
+    )
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {"detail": "Book with this title already exists"}
