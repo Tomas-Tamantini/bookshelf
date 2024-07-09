@@ -47,8 +47,6 @@ def test_author_crud(end_to_end_client):
     }
 
 
-# TODO: Unskip test
-@pytest.mark.skip(reason="get_by_id not implemented yet")
 @pytest.mark.end_to_end
 def test_book_crud(end_to_end_client):
     # Prerequisite: Create author
@@ -68,6 +66,15 @@ def test_book_crud(end_to_end_client):
     }
     # Update
     response = end_to_end_client.patch("/books/1", json={"year": 2000})
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        "id": 1,
+        "title": "the pragmatic programmer",
+        "year": 2000,
+        "author_id": author_id,
+    }
+    # Read by ID
+    response = end_to_end_client.get("/books/1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
         "id": 1,

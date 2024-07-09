@@ -32,3 +32,19 @@ def test_in_memory_book_repository_deletes_book(repository):
     book = repository.add(BookCore(title="Book 1", author_id=1, year=2021))
     repository.delete(book.id)
     assert not repository.id_exists(book.id)
+
+
+def test_in_memory_book_repository_updates_book(repository):
+    book = repository.add(BookCore(title="Original", author_id=1, year=2021))
+    updated_book = repository.update(
+        book.id, BookCore(title="Updated", author_id=1, year=2021)
+    )
+    assert updated_book == Book(id=book.id, title="Updated", author_id=1, year=2021)
+    assert repository.title_exists("Updated")
+    assert not repository.title_exists("Original")
+
+
+def test_in_memory_book_repository_gets_book_by_id(repository):
+    book = repository.add(BookCore(title="Book 1", author_id=1, year=2021))
+    assert repository.get_by_id(book.id) == book
+    assert repository.get_by_id(123) is None

@@ -20,7 +20,9 @@ class InMemoryBookRepository:
         self._books = [book for book in self._books if book.id != book_id]
 
     def update(self, book_id: int, book: BookCore) -> Book:
-        raise NotImplementedError()
+        updated = Book(id=book_id, **book.model_dump())
+        self._books = [updated if book.id == book_id else book for book in self._books]
+        return updated
 
     def get_by_id(self, book_id: int) -> Book:
-        raise NotImplementedError()
+        return next((book for book in self._books if book.id == book_id), None)

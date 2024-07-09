@@ -51,8 +51,10 @@ def update_book(
             detail="Author with this ID does not exist",
         )
     else:
-        existing_book = Book(id=book_id, title="", year=0, author_id=0)
-        return book_repository.update(book_id, book.updated(existing_book))
+        if (existing_book := book_repository.get_by_id(book_id)) is None:
+            raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+        else:
+            return book_repository.update(book_id, book.updated(existing_book))
 
 
 @books_router.get("/{book_id}", response_model=Book)

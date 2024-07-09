@@ -1,7 +1,5 @@
 from http import HTTPStatus
 
-import pytest
-
 
 def test_creating_book_with_missing_fields_returns_unprocessable_entity(client):
     response = client.post("/books", json={})
@@ -96,8 +94,6 @@ def test_updating_book_sanitizes_new_title_before_storing(client, mock_book_repo
     assert mock_book_repository.update.call_args[0][1].title == "new title"
 
 
-# TODO: Unskip test
-@pytest.mark.skip(reason="get_by_id not implemented yet")
 def test_updating_book_with_nonexistent_id_returns_not_found(
     client, mock_book_repository
 ):
