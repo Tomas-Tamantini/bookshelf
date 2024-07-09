@@ -104,3 +104,11 @@ def test_updating_book_with_nonexistent_id_returns_not_found(
     mock_book_repository.get_by_id.return_value = None
     response = client.patch("/books/123", json={"title": "New title"})
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_updating_book_with_invalid_author_id_returns_not_found(
+    client, mock_author_repository
+):
+    mock_author_repository.id_exists.return_value = False
+    response = client.patch("/books/123", json={"author_id": 123})
+    assert response.status_code == HTTPStatus.NOT_FOUND

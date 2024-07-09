@@ -40,7 +40,16 @@ def delete_book(book_id: int, book_repository: T_BookRepository):
 
 @books_router.patch("/{book_id}", response_model=Book)
 def update_book(
-    book_id: int, book: PatchBookRequest, book_repository: T_BookRepository
+    book_id: int,
+    book: PatchBookRequest,
+    book_repository: T_BookRepository,
+    author_repository: T_AuthorRepository,
 ):
-    existing_book = Book(id=book_id, title="", year=0, author_id=0)
-    return book_repository.update(book_id, book.updated(existing_book))
+    if book.author_id is not None and not author_repository.id_exists(book.author_id):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Author with this ID does not exist",
+        )
+    else:
+        existing_book = Book(id=book_id, title="", year=0, author_id=0)
+        return book_repository.update(book_id, book.updated(existing_book))
