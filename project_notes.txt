@@ -1,0 +1,30 @@
+Project decisions:
+    - Test-Driven-Development - Excellent test coverage
+    - Including github actions from the start
+    - Having separate models for the API DTO's, Database DTO's, and domain models (was it a good idea to have the domain folder? It's awfully empty)
+    - Using the repository pattern
+    - Not using a Unit of work pattern
+    - Explicitely query database to check for conflicts, rather than raising errors (avoid using errors for control, but break the ask-dont-tell principle)
+    - Leaving the DB for last (developing with just in-memory implementation of the repositories)
+
+
+    - A LOT of dependency injection (Authentication, authorization, repositories, etc.), making most tests very fast
+    - Explicitely marking the integration and end-to-end tests
+    - Grouping the query parameters into one pydantic object, rather than using fastapi's Query object. Example:
+
+        
+            @authors_router.get("/", status_code=HTTPStatus.OK, response_model=GetAuthorsResponse)
+            def get_authors(
+                author_repository: T_AuthorRepository,
+                query_parameters: GetAuthorsQueryParameters = Depends(),
+            )
+
+            instead of:
+
+            @authors_router.get("/", status_code=HTTPStatus.OK, response_model=GetAuthorsResponse)
+            def get_authors(
+                author_repository: T_AuthorRepository,
+                offset: int = Query(None),
+                limit: int = Query(None),
+                name: str = Query(None),
+            )
