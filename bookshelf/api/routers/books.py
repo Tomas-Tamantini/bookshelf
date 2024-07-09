@@ -27,3 +27,12 @@ def create_book(
         )
     else:
         return book_repository.add(book.sanitized())
+
+
+@books_router.delete("/{book_id}", status_code=HTTPStatus.OK.value)
+def delete_book(book_id: int, book_repository: T_BookRepository):
+    if not book_repository.id_exists(book_id):
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+    else:
+        book_repository.delete(book_id)
+        return {"message": "Book deleted"}

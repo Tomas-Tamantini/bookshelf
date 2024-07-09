@@ -64,3 +64,7 @@ def test_book_crud(end_to_end_client):
         "year": 1999,
         "author_id": author_id,
     }
+    # Delete
+    response = end_to_end_client.delete("/books/1")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"message": "Book deleted"}

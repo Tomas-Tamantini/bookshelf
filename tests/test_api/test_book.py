@@ -47,3 +47,26 @@ def test_creating_book_with_ineixsting_author_returns_not_found(
 
     response = client.post("/books", json=valid_book_request)
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_deleting_existing_book_returns_status_ok(client):
+    response = client.delete("/books/123")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_deleting_existing_book_returns_success_message(client):
+    response = client.delete("/books/123")
+    assert response.json() == {"message": "Book deleted"}
+
+
+def test_deleting_existing_book_delegates_to_repository(client, mock_book_repository):
+    client.delete("/books/123")
+    mock_book_repository.delete.assert_called_once_with(123)
+
+
+def test_deleting_book_with_nonexistent_id_returns_not_found(
+    client, mock_book_repository
+):
+    mock_book_repository.id_exists.return_value = False
+    response = client.delete("/books/123")
+    assert response.status_code == HTTPStatus.NOT_FOUND

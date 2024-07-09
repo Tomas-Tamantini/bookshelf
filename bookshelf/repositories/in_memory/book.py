@@ -12,3 +12,9 @@ class InMemoryBookRepository:
 
     def title_exists(self, title: str) -> bool:
         return any(book.title == title for book in self._books)
+
+    def id_exists(self, book_id: int) -> bool:
+        return any(book.id == book_id for book in self._books)
+
+    def delete(self, book_id: int) -> None:
+        self._books = [book for book in self._books if book.id != book_id]
