@@ -112,3 +112,22 @@ def test_updating_book_with_invalid_author_id_returns_not_found(
     mock_author_repository.id_exists.return_value = False
     response = client.patch("/books/123", json={"author_id": 123})
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_getting_book_by_id_returns_status_ok(client):
+    response = client.get("/books/123")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_getting_existing_book_returns_book(client, mock_book_repository):
+    book = {"id": 123, "title": "Stored title", "year": 1999, "author_id": 1}
+    mock_book_repository.get_by_id.return_value = book
+
+    response = client.get("/books/123")
+    assert response.json() == book
+
+
+def test_getting_book_by_nonexistent_id_returns_not_found(client, mock_book_repository):
+    mock_book_repository.get_by_id.return_value = None
+    response = client.get("/books/123")
+    assert response.status_code == HTTPStatus.NOT_FOUND

@@ -12,4 +12,5 @@ def mock_book_repository(book):
     repo.title_exists.return_value = False
     repo.id_exists.return_value = True
     repo.update.return_value = book
+    repo.get_by_id.return_value = book
     return repo

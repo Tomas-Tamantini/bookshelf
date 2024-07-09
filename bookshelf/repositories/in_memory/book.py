@@ -21,3 +21,6 @@ class InMemoryBookRepository:
 
     def update(self, book_id: int, book: BookCore) -> Book:
         raise NotImplementedError()
+
+    def get_by_id(self, book_id: int) -> Book:
+        raise NotImplementedError()
