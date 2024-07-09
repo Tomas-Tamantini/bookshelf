@@ -18,3 +18,6 @@ class InMemoryBookRepository:
 
     def delete(self, book_id: int) -> None:
         self._books = [book for book in self._books if book.id != book_id]
+
+    def update(self, book_id: int, book: BookCore) -> Book:
+        raise NotImplementedError()

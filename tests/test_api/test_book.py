@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+import pytest
+
 
 def test_creating_book_with_missing_fields_returns_unprocessable_entity(client):
     response = client.post("/books", json={})
@@ -69,4 +71,36 @@ def test_deleting_book_with_nonexistent_id_returns_not_found(
 ):
     mock_book_repository.id_exists.return_value = False
     response = client.delete("/books/123")
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_updating_book_with_bad_fields_returns_unprocessable_entity(client):
+    response = client.patch("/books/123", json={"bad_field": 123})
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+def test_updating_existing_book_returns_status_ok(client):
+    response = client.patch("/books/123", json={"year": 2000})
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_updating_existing_book_returns_updated_book(client, mock_book_repository):
+    updated = {"id": 123, "title": "Updated title", "year": 2000, "author_id": 1}
+    mock_book_repository.update.return_value = updated
+    response = client.patch("/books/123", json={"year": 2000})
+    assert response.json() == updated
+
+
+def test_updating_book_sanitizes_new_title_before_storing(client, mock_book_repository):
+    client.patch("/books/123", json={"title": "  New   Title  "})
+    assert mock_book_repository.update.call_args[0][1].title == "new title"
+
+
+# TODO: Unskip test
+@pytest.mark.skip(reason="get_by_id not implemented yet")
+def test_updating_book_with_nonexistent_id_returns_not_found(
+    client, mock_book_repository
+):
+    mock_book_repository.get_by_id.return_value = None
+    response = client.patch("/books/123", json={"title": "New title"})
     assert response.status_code == HTTPStatus.NOT_FOUND

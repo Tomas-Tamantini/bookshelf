@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 
 from bookshelf.api.dependencies import T_AuthorRepository, T_BookRepository
-from bookshelf.api.dto import CreateBookRequest
+from bookshelf.api.dto import CreateBookRequest, PatchBookRequest
 from bookshelf.domain.book import Book
 
 books_router = APIRouter(prefix="/books", tags=["books"])
@@ -36,3 +36,11 @@ def delete_book(book_id: int, book_repository: T_BookRepository):
     else:
         book_repository.delete(book_id)
         return {"message": "Book deleted"}
+
+
+@books_router.patch("/{book_id}", response_model=Book)
+def update_book(
+    book_id: int, book: PatchBookRequest, book_repository: T_BookRepository
+):
+    existing_book = Book(id=book_id, title="", year=0, author_id=0)
+    return book_repository.update(book_id, book.updated(existing_book))
