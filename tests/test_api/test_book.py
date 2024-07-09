@@ -47,3 +47,15 @@ def test_creating_book_with_existing_title_returns_conflict(
     )
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json() == {"detail": "Book with this title already exists"}
+
+
+def test_creating_book_with_ineixsting_author_returns_not_found(
+    client, mock_author_repository
+):
+    mock_author_repository.id_exists.return_value = False
+
+    response = client.post(
+        "/books",
+        json={"title": "The Pragmatic Programmer", "year": 1999, "author_id": 1},
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
