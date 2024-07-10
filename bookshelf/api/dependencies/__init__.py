@@ -1,3 +1,4 @@
+from .get_authentication_services import T_PasswordHandler, get_password_handler
 from .get_repositories import (
     T_AuthorRepository,
     T_BookRepository,
