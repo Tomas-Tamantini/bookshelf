@@ -12,4 +12,4 @@ users_router = APIRouter(prefix="/users", tags=["users"])
     "/", status_code=HTTPStatus.CREATED.value, response_model=UserResponse
 )
 def create_user(user: CreateUserRequest, user_repository: T_UserRepository):
-    return user_repository.add(user)
+    return user_repository.add(user.sanitized())
