@@ -1,4 +1,1 @@
-from .authors import authors_router
-from .books import books_router
-from .healthcheck import healthcheck_router
-from .users import users_router
+from .set_routes import set_all_routes
