@@ -1,9 +1,14 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from bookshelf.api.dependencies import T_AuthorRepository, T_BookRepository
-from bookshelf.api.dto import CreateBookRequest, PatchBookRequest
+from bookshelf.api.dto import (
+    CreateBookRequest,
+    GetBooksQueryParameters,
+    GetBooksResponse,
+    PatchBookRequest,
+)
 from bookshelf.domain.book import Book
 
 books_router = APIRouter(prefix="/books", tags=["books"])
@@ -64,3 +69,20 @@ def get_book(book_id: int, book_repository: T_BookRepository):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     else:
         return book
+
+
+@books_router.get("/", status_code=HTTPStatus.OK, response_model=GetBooksResponse)
+def get_books(
+    book_repository: T_BookRepository,
+    query_parameters: GetBooksQueryParameters = Depends(),
+):
+    db_query_parameters = query_parameters.sanitized()
+    db_response = book_repository.get_filtered(db_query_parameters)
+    return GetBooksResponse(
+        limit=db_query_parameters.limit,
+        offset=db_query_parameters.offset,
+        title=db_query_parameters.title,
+        author_id=db_query_parameters.author_id,
+        year=db_query_parameters.year,
+        **db_response.model_dump(),
+    )

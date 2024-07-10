@@ -86,3 +86,33 @@ def test_book_crud(end_to_end_client):
     response = end_to_end_client.delete("/books/1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "Book deleted"}
+    # Get by query parameters
+    titles = (
+        "The Pragmatic Programmer",
+        "Clean Code",
+        "Refactoring",
+        "Clean Architecture",
+    )
+    for title in titles:
+        end_to_end_client.post(
+            "/books/",
+            json={"title": title, "year": 2000, "author_id": author_id},
+        )
+    response = end_to_end_client.get("/books?title=Clean&limit=123&offset=1")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        "limit": 123,
+        "offset": 1,
+        "total": 2,
+        "title": "clean",
+        "author_id": None,
+        "year": None,
+        "books": [
+            {
+                "id": 4,
+                "title": "clean architecture",
+                "year": 2000,
+                "author_id": author_id,
+            },
+        ],
+    }

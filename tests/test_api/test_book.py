@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from bookshelf.api.dto import GetBooksResponse
+
 
 def test_creating_book_with_missing_fields_returns_unprocessable_entity(client):
     response = client.post("/books", json={})
@@ -127,3 +129,39 @@ def test_getting_book_by_nonexistent_id_returns_not_found(client, mock_book_repo
     mock_book_repository.get_by_id.return_value = None
     response = client.get("/books/123")
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_getting_books_returns_status_ok(client):
+    response = client.get("/books")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_getting_books_by_title_sanitizes_title_before_querying(
+    client, mock_book_repository
+):
+    client.get("/books?title=  The   Pragmatic Programmer  ")
+    assert (
+        mock_book_repository.get_filtered.call_args[0][0].title
+        == "the pragmatic programmer"
+    )
+
+
+def test_getting_books_returns_paginated_and_filtered_books(
+    client, mock_book_repository, get_books_db_response
+):
+    mock_book_repository.get_filtered.return_value = get_books_db_response
+    api_response = client.get("/books?title=title&offset=2&year=1999")
+    assert (
+        api_response.json()
+        == GetBooksResponse(
+            limit=20,
+            offset=2,
+            title="title",
+            year=1999,
+            author_id=None,
+            **get_books_db_response.model_dump()
+        ).model_dump()
+    )
+    assert mock_book_repository.get_filtered.call_args[0][0].title == "title"
+    assert mock_book_repository.get_filtered.call_args[0][0].year == 1999
+    assert mock_book_repository.get_filtered.call_args[0][0].offset == 2

@@ -1,3 +1,8 @@
 from .author import CreateAuthorRequest, GetAuthorsQueryParameters, GetAuthorsResponse
-from .book import CreateBookRequest, PatchBookRequest
+from .book import (
+    CreateBookRequest,
+    GetBooksQueryParameters,
+    GetBooksResponse,
+    PatchBookRequest,
+)
 from .message import Message
