@@ -1,6 +1,7 @@
 from typing import Protocol
 
 from bookshelf.domain.book import Book, BookCore
+from bookshelf.repositories.dto import GetBooksDBQueryParameters, GetBooksDBResponse
 
 
 class BookRepository(Protocol):
@@ -15,3 +16,7 @@ class BookRepository(Protocol):
     def update(self, book_id: int, book: BookCore) -> Book: ...
 
     def get_by_id(self, book_id: int) -> Book: ...
+
+    def get_filtered(
+        self, query_parameters: GetBooksDBQueryParameters
+    ) -> GetBooksDBResponse: ...

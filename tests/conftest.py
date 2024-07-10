@@ -4,5 +4,5 @@ from tests.fixtures.author_repository import (
     mock_author_repository,
 )
 from tests.fixtures.book import book, valid_book_request
-from tests.fixtures.book_repository import mock_book_repository
+from tests.fixtures.book_repository import get_books_db_response, mock_book_repository
 from tests.fixtures.client import client, end_to_end_client
