@@ -54,3 +54,23 @@ def test_user_password_gets_hashed_before_being_stored(
     client.post("/users", json=req)
     assert mock_password_handler.hash_password.call_args[0][0] == "password"
     assert mock_user_repository.add.call_args[0][0].hashed_password == "123"
+
+
+def test_creating_user_with_existing_username_returns_conflict(
+    client, mock_user_repository, valid_user_request
+):
+    mock_user_repository.username_exists.return_value = True
+
+    response = client.post("/users", json=valid_user_request)
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {"detail": "User with this username already exists"}
+
+
+def test_creating_user_with_existing_email_returns_conflict(
+    client, mock_user_repository, valid_user_request
+):
+    mock_user_repository.email_exists.return_value = True
+
+    response = client.post("/users", json=valid_user_request)
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {"detail": "User with this email already exists"}
