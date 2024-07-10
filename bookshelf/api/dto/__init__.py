@@ -6,4 +6,4 @@ from .book import (
     PatchBookRequest,
 )
 from .message import Message
-from .user import CreateUserRequest
+from .user import CreateUserRequest, UserResponse

@@ -1,5 +1,9 @@
-from bookshelf.domain.user import UserCore
+from bookshelf.domain.user import UserPublicInformation
 
 
-class CreateUserRequest(UserCore):
-    pass
+class CreateUserRequest(UserPublicInformation):
+    password: str
+
+
+class UserResponse(UserPublicInformation):
+    id: int
