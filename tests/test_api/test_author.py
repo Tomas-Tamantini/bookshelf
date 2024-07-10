@@ -141,7 +141,7 @@ def test_getting_authors_by_name_sanitizes_name_before_querying_database(
     assert mock_author_repository.get_filtered.call_args[0][0].name == "andrew"
 
 
-def test_getting_authors_returns_matching_authors(
+def test_getting_authors_returns_paginated_and_filtered_authors(
     client, mock_author_repository, get_authors_db_response
 ):
     mock_author_repository.get_filtered.return_value = get_authors_db_response
@@ -152,3 +152,6 @@ def test_getting_authors_returns_matching_authors(
             limit=10, offset=20, **get_authors_db_response.model_dump()
         ).model_dump()
     )
+    assert mock_author_repository.get_filtered.call_args[0][0].name == "andrew"
+    assert mock_author_repository.get_filtered.call_args[0][0].limit == 10
+    assert mock_author_repository.get_filtered.call_args[0][0].offset == 20
