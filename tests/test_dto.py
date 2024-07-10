@@ -1,8 +1,9 @@
 import pytest
 
-from bookshelf.api.dto import PatchBookRequest
+from bookshelf.api.dto import CreateUserRequest, PatchBookRequest
 from bookshelf.api.dto.sanitize import sanitize_name
 from bookshelf.domain.book import Book, BookCore
+from bookshelf.domain.user import UserCore
 
 
 @pytest.mark.parametrize(
@@ -50,3 +51,9 @@ def test_patch_book_requests_sanitizes_new_title():
     patch = PatchBookRequest(title="  new Title  ", year=2020)
     updated = patch.updated(existing_book)
     assert updated == BookCore(title="new title", year=2020, author_id=1)
+
+
+def test_user_request_hashes_password():
+    request = CreateUserRequest(email="a@b.com", username="user", password="pass")
+    hashed = request.hash_password(lambda x: x.upper())
+    assert hashed == UserCore(email="a@b.com", username="user", hashed_password="PASS")

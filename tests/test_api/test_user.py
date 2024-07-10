@@ -36,9 +36,21 @@ def test_creating_valid_user_returns_user_with_id_given_by_repository_without_pa
     assert response.json() == {"id": 123, "email": "a@b.com", "username": "user"}
 
 
-def test_user_name_gets_sanitized_before_being_stored(client, mock_user_repository):
-    client.post(
-        "/users",
-        json={"email": "a@b.com", "username": "  User  nAmE  ", "password": "password"},
-    )
+def test_user_name_gets_sanitized_before_being_stored(
+    client, mock_user_repository, valid_user_request
+):
+    req = valid_user_request
+    req["username"] = "  User  nAmE  "
+    client.post("/users", json=req)
     assert mock_user_repository.add.call_args[0][0].username == "user name"
+
+
+def test_user_password_gets_hashed_before_being_stored(
+    client, mock_user_repository, valid_user_request, mock_password_handler
+):
+    req = valid_user_request
+    req["password"] = "password"
+    mock_password_handler.hash_password.return_value = "123"
+    client.post("/users", json=req)
+    assert mock_password_handler.hash_password.call_args[0][0] == "password"
+    assert mock_user_repository.add.call_args[0][0].hashed_password == "123"

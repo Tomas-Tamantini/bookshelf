@@ -1,5 +1,7 @@
+from typing import Callable
+
 from bookshelf.api.dto.sanitize import sanitize_name
-from bookshelf.domain.user import UserPublicInformation
+from bookshelf.domain.user import UserCore, UserPublicInformation
 
 
 class CreateUserRequest(UserPublicInformation):
@@ -10,6 +12,13 @@ class CreateUserRequest(UserPublicInformation):
             email=self.email,
             username=sanitize_name(self.username),
             password=self.password,
+        )
+
+    def hash_password(self, hash_method: Callable[[str], str]) -> UserCore:
+        return UserCore(
+            email=self.email,
+            username=self.username,
+            hashed_password=hash_method(self.password),
         )
 
 
