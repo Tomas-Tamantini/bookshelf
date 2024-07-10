@@ -9,4 +9,8 @@ class UserPublicInformation(BaseModel):
 
 
 class UserCore(UserPublicInformation):
-    password: str
+    hashed_password: str
+
+
+class User(UserCore):
+    id: int
