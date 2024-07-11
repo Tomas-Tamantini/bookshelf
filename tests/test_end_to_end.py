@@ -116,3 +116,16 @@ def test_book_crud(end_to_end_client):
             },
         ],
     }
+
+
+# TODO: Unskip
+@pytest.mark.skip("Not implemented yet")
+@pytest.mark.end_to_end
+def test_user_crud(end_to_end_client):
+    # Create
+    response = end_to_end_client.post(
+        "/users/",
+        json={"username": " User ", "email": "a@b.com", "password": "password"},
+    )
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json() == {"id": 1, "username": "user", "email": "a@b.com"}
