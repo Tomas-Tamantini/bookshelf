@@ -163,3 +163,26 @@ def test_updating_user_with_nonexistent_id_returns_not_found(
     mock_user_repository.id_exists.return_value = False
     response = client.put("/users/123", json=valid_user_request)
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_getting_user_by_id_returns_status_ok(client):
+    response = client.get("/users/123")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_getting_existing_user_returns_user_without_password(
+    client, mock_user_repository
+):
+    user = {"id": 123, "email": "a@b.com", "username": "user", "hashed_password": "123"}
+    mock_user_repository.get_by_id.return_value = user
+
+    response = client.get("/users/123")
+    assert response.json() == {"id": 123, "email": "a@b.com", "username": "user"}
+
+
+def test_getting_user_with_nonexistent_id_returns_not_found(
+    client, mock_user_repository
+):
+    mock_user_repository.get_by_id.return_value = None
+    response = client.get("/users/123")
+    assert response.status_code == HTTPStatus.NOT_FOUND

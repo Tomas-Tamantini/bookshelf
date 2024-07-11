@@ -11,4 +11,5 @@ def mock_user_repository(user):
     repo.add.return_value = user
     repo.update.return_value = user
     repo.id_exists.return_value = True
+    repo.get_by_id.return_value = user
     return repo

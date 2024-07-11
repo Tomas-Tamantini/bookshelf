@@ -41,3 +41,11 @@ def update_user(
         )
     except ConflictError as e:
         raise HttpConflictError("User", e.field) from e
+
+
+@users_router.get("/{user_id}", response_model=UserResponse)
+def get_user(user_id: int, user_repository: T_UserRepository):
+    user = user_repository.get_by_id(user_id)
+    if user is None:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+    return user

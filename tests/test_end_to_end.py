@@ -134,3 +134,7 @@ def test_user_crud(end_to_end_client):
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"id": 1, "username": "new user", "email": "a@b.com"}
+    # Read by ID
+    response = end_to_end_client.get("/users/1")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"id": 1, "username": "new user", "email": "a@b.com"}
