@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from bookshelf.api.dto import GetBooksResponse
+from bookshelf.repositories.exceptions import ConflictError
 
 
 def test_creating_book_with_missing_fields_returns_unprocessable_entity(client):
@@ -35,7 +36,7 @@ def test_book_name_gets_sanitized_beofre_being_stored(client, mock_book_reposito
 def test_creating_book_with_existing_title_returns_conflict(
     client, mock_book_repository, valid_book_request
 ):
-    mock_book_repository.title_exists.return_value = True
+    mock_book_repository.add.side_effect = ConflictError("title")
 
     response = client.post("/books", json=valid_book_request)
     assert response.status_code == HTTPStatus.CONFLICT
@@ -110,6 +111,15 @@ def test_updating_book_with_invalid_author_id_returns_not_found(
     mock_author_repository.id_exists.return_value = False
     response = client.patch("/books/123", json={"author_id": 123})
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_updating_book_with_existing_title_returns_conflict(
+    client, mock_book_repository
+):
+    mock_book_repository.update.side_effect = ConflictError("title")
+    response = client.patch("/books/123", json={"title": "New title"})
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {"detail": "Book with this title already exists"}
 
 
 def test_getting_book_by_id_returns_status_ok(client):

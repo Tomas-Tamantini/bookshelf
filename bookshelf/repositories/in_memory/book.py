@@ -1,5 +1,6 @@
 from bookshelf.domain.book import Book, BookCore
 from bookshelf.repositories.dto import GetBooksDBQueryParameters, GetBooksDBResponse
+from bookshelf.repositories.exceptions import ConflictError
 
 
 class InMemoryBookRepository:
@@ -7,11 +8,13 @@ class InMemoryBookRepository:
         self._books = []
 
     def add(self, book: BookCore) -> Book:
+        if self._title_exists(book.title):
+            raise ConflictError("title")
         book = Book(id=len(self._books) + 1, **book.model_dump())
         self._books.append(book)
         return book
 
-    def title_exists(self, title: str) -> bool:
+    def _title_exists(self, title: str) -> bool:
         return any(book.title == title for book in self._books)
 
     def id_exists(self, book_id: int) -> bool:
@@ -20,7 +23,13 @@ class InMemoryBookRepository:
     def delete(self, book_id: int) -> None:
         self._books = [book for book in self._books if book.id != book_id]
 
+    def _title_changed(self, book_id: int, book: BookCore) -> bool:
+        old_book = self.get_by_id(book_id)
+        return old_book.title != book.title
+
     def update(self, book_id: int, book: BookCore) -> Book:
+        if self._title_changed(book_id, book) and self._title_exists(book.title):
+            raise ConflictError("title")
         updated = Book(id=book_id, **book.model_dump())
         self._books = [updated if book.id == book_id else book for book in self._books]
         return updated

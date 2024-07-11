@@ -10,6 +10,7 @@ from bookshelf.api.dto import (
     PatchBookRequest,
 )
 from bookshelf.domain.book import Book
+from bookshelf.repositories.exceptions import ConflictError
 
 books_router = APIRouter(prefix="/books", tags=["books"])
 
@@ -20,18 +21,19 @@ def create_book(
     book_repository: T_BookRepository,
     author_repository: T_AuthorRepository,
 ):
-    if book_repository.title_exists(book.title):
-        raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail="Book with this title already exists",
-        )
-    elif not author_repository.id_exists(book.author_id):
+    if not author_repository.id_exists(book.author_id):
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail="Author with this ID does not exist",
         )
     else:
-        return book_repository.add(book.sanitized())
+        try:
+            return book_repository.add(book.sanitized())
+        except ConflictError as e:
+            raise HTTPException(
+                status_code=HTTPStatus.CONFLICT,
+                detail=f"Book with this {e.field} already exists",
+            ) from e
 
 
 @books_router.delete("/{book_id}", status_code=HTTPStatus.OK.value)
@@ -59,7 +61,13 @@ def update_book(
         if (existing_book := book_repository.get_by_id(book_id)) is None:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
         else:
-            return book_repository.update(book_id, book.updated(existing_book))
+            try:
+                return book_repository.update(book_id, book.updated(existing_book))
+            except ConflictError as e:
+                raise HTTPException(
+                    status_code=HTTPStatus.CONFLICT,
+                    detail=f"Book with this {e.field} already exists",
+                ) from e
 
 
 @books_router.get("/{book_id}", response_model=Book)

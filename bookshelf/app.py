@@ -4,3 +4,6 @@ from bookshelf.api.routers import set_all_routes
 
 app = FastAPI()
 set_all_routes(app)
+
+
+# TODO: Do sanitization step as middleware

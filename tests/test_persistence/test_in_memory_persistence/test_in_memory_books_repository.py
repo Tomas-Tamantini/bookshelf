@@ -2,6 +2,7 @@ import pytest
 
 from bookshelf.domain.book import Book, BookCore
 from bookshelf.repositories.dto import GetBooksDBQueryParameters
+from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryBookRepository
 
 
@@ -17,10 +18,12 @@ def test_adding_book_in_memory_increments_id(repository):
     assert book_2 == Book(id=2, title="Book 2", author_id=2, year=2021)
 
 
-def test_in_memory_book_repository_keeps_track_of_existing_titles(repository):
+def test_adding_book_with_existing_title_to_in_memory_repository_raises_conflict_error(
+    repository,
+):
     repository.add(BookCore(title="Book 1", author_id=1, year=2021))
-    assert repository.title_exists("Book 1")
-    assert not repository.title_exists("Book 2")
+    with pytest.raises(ConflictError):
+        repository.add(BookCore(title="Book 1", author_id=2, year=2022))
 
 
 def test_in_memory_book_repository_keeps_track_of_ids(repository):
@@ -41,8 +44,15 @@ def test_in_memory_book_repository_updates_book(repository):
         book.id, BookCore(title="Updated", author_id=1, year=2021)
     )
     assert updated_book == Book(id=book.id, title="Updated", author_id=1, year=2021)
-    assert repository.title_exists("Updated")
-    assert not repository.title_exists("Original")
+
+
+def test_updating_book_with_existing_title_in_memory_repository_raises_conflict_error(
+    repository,
+):
+    book = repository.add(BookCore(title="Book 1", author_id=1, year=2021))
+    repository.add(BookCore(title="Book 2", author_id=1, year=2021))
+    with pytest.raises(ConflictError):
+        repository.update(book.id, BookCore(title="Book 2", author_id=1, year=2021))
 
 
 def test_in_memory_book_repository_gets_book_by_id(repository):

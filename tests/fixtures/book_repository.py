@@ -15,7 +15,6 @@ def get_books_db_response():
 def mock_book_repository(book, get_books_db_response):
     repo = Mock(spec=BookRepository)
     repo.add.return_value = book
-    repo.title_exists.return_value = False
     repo.id_exists.return_value = True
     repo.update.return_value = book
     repo.get_by_id.return_value = book
