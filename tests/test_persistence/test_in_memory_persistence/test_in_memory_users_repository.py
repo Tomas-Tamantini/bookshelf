@@ -39,3 +39,54 @@ def test_adding_user_with_existing_email_in_repository_raises_conflict_error(
     with pytest.raises(ConflictError) as exc_info:
         repository.add(user_b)
     assert exc_info.value.field == "email"
+
+
+def test_in_memory_user_repository_keeps_track_of_ids(repository, user_core):
+    user = user_core()
+    repository.add(user)
+    assert repository.id_exists(1)
+    assert not repository.id_exists(2)
+
+
+def test_in_memory_user_repository_deletes_user(repository, user_core):
+    user = user_core()
+    user = repository.add(user)
+    repository.delete(user.id)
+    assert not repository.id_exists(user.id)
+
+
+def test_in_memory_user_repository_updates_user(repository, user_core):
+    user = user_core()
+    user = repository.add(user)
+    updated_user = repository.update(user.id, user_core(username="Updated"))
+    assert updated_user == User(
+        id=user.id, **user_core(username="Updated").model_dump()
+    )
+
+
+def test_in_memory_user_repository_raises_conflict_error_if_updating_to_existing_name(
+    repository, user_core
+):
+    user = user_core(username="user1", email="a@b.com")
+    user = repository.add(user)
+    repository.add(user_core(username="user2", email="c@d.com"))
+    with pytest.raises(ConflictError) as exc_info:
+        repository.update(user.id, user_core(username="user2", email="a@b.com"))
+    assert exc_info.value.field == "username"
+
+
+def test_in_memory_user_repository_raises_conflict_error_if_updating_to_existing_email(
+    repository, user_core
+):
+    user = user_core(username="user1", email="a@b.com")
+    user = repository.add(user)
+    repository.add(user_core(username="user2", email="c@d.com"))
+    with pytest.raises(ConflictError) as exc_info:
+        repository.update(user.id, user_core(username="user1", email="c@d.com"))
+    assert exc_info.value.field == "email"
+
+
+def test_in_memory_user_repository_gets_user_by_id(repository, user_core):
+    user = user_core()
+    user = repository.add(user)
+    assert repository.get_by_id(user.id) == user
