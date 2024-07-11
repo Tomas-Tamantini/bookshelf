@@ -24,3 +24,20 @@ def create_user(
         )
     except ConflictError as e:
         raise HttpConflictError("User", e.field) from e
+
+
+@users_router.put("/{user_id}", response_model=UserResponse)
+def update_user(
+    user_id: int,
+    user: CreateUserRequest,
+    user_repository: T_UserRepository,
+    password_handler: T_PasswordHandler,
+):
+    if not user_repository.id_exists(user_id):
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+    try:
+        return user_repository.update(
+            user_id, user.sanitized().hash_password(password_handler.hash)
+        )
+    except ConflictError as e:
+        raise HttpConflictError("User", e.field) from e

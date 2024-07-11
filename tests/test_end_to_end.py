@@ -127,3 +127,10 @@ def test_user_crud(end_to_end_client):
     )
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {"id": 1, "username": "user", "email": "a@b.com"}
+    # Update
+    response = end_to_end_client.put(
+        "/users/1",
+        json={"username": " New User ", "email": "a@b.com", "password": "password"},
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"id": 1, "username": "new user", "email": "a@b.com"}
