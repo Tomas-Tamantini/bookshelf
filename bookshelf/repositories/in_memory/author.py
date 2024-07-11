@@ -25,9 +25,12 @@ class InMemoryAuthorRepository:
     def delete(self, author_id: int) -> None:
         self._authors = [author for author in self._authors if author.id != author_id]
 
-    def update(self, author_id: int, updated: AuthorCore) -> Author:
+    def _name_changed(self, author_id: int, author: AuthorCore) -> bool:
         old_author = self.get_by_id(author_id)
-        if old_author.name != updated.name and self._name_exists(updated.name):
+        return old_author.name != author.name
+
+    def update(self, author_id: int, updated: AuthorCore) -> Author:
+        if self._name_changed(author_id, updated) and self._name_exists(updated.name):
             raise ConflictError("name")
         updated = Author(id=author_id, **updated.model_dump())
         self._authors = [
