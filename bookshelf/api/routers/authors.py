@@ -9,6 +9,7 @@ from bookshelf.api.dto import (
     GetAuthorsResponse,
     Message,
 )
+from bookshelf.api.exceptions import HttpConflictError
 from bookshelf.domain.author import Author
 from bookshelf.repositories.exceptions import ConflictError
 
@@ -20,10 +21,7 @@ def create_author(author: CreateAuthorRequest, author_repository: T_AuthorReposi
     try:
         return author_repository.add(author.sanitized())
     except ConflictError as e:
-        raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail=f"Author with this {e.field} already exists",
-        ) from e
+        raise HttpConflictError("Author", e.field) from e
 
 
 @authors_router.delete(
@@ -49,10 +47,7 @@ def update_author(
         try:
             return author_repository.update(author_id, author.sanitized())
         except ConflictError as e:
-            raise HTTPException(
-                status_code=HTTPStatus.CONFLICT,
-                detail=f"Author with this {e.field} already exists",
-            ) from e
+            raise HttpConflictError("Author", e.field) from e
 
 
 @authors_router.get("/{author_id}", response_model=Author)

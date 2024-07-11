@@ -9,6 +9,7 @@ from bookshelf.api.dto import (
     GetBooksResponse,
     PatchBookRequest,
 )
+from bookshelf.api.exceptions import HttpConflictError
 from bookshelf.domain.book import Book
 from bookshelf.repositories.exceptions import ConflictError
 
@@ -30,10 +31,7 @@ def create_book(
         try:
             return book_repository.add(book.sanitized())
         except ConflictError as e:
-            raise HTTPException(
-                status_code=HTTPStatus.CONFLICT,
-                detail=f"Book with this {e.field} already exists",
-            ) from e
+            raise HttpConflictError("Book", e.field) from e
 
 
 @books_router.delete("/{book_id}", status_code=HTTPStatus.OK.value)
@@ -64,10 +62,7 @@ def update_book(
             try:
                 return book_repository.update(book_id, book.updated(existing_book))
             except ConflictError as e:
-                raise HTTPException(
-                    status_code=HTTPStatus.CONFLICT,
-                    detail=f"Book with this {e.field} already exists",
-                ) from e
+                raise HttpConflictError("Book", e.field) from e
 
 
 @books_router.get("/{book_id}", response_model=Book)
