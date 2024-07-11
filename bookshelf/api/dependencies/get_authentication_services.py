@@ -1,9 +1,9 @@
 from typing import Annotated
 
 from fastapi import Depends
+from pwdlib import PasswordHash
 
 from bookshelf.api.authentication import PasswordHandler
-from pwdlib import PasswordHash
 
 
 def get_password_handler() -> PasswordHandler:
