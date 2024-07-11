@@ -2,6 +2,7 @@ import pytest
 
 from bookshelf.domain.author import Author, AuthorCore
 from bookshelf.repositories.dto import GetAuthorsDBQueryParameters
+from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryAuthorRepository
 
 
@@ -17,10 +18,13 @@ def test_adding_author_in_memory_increments_id(repository):
     assert auth_2 == Author(id=2, name="Author 2")
 
 
-def test_in_memory_author_repository_keeps_track_of_existing_names(repository):
-    repository.add(AuthorCore(name="Author 1"))
-    assert repository.name_exists("Author 1")
-    assert not repository.name_exists("Author 2")
+def test_adding_author_in_memory_with_existing_name_raises_conflict_error(repository):
+    auth_a = AuthorCore(name="Author 1")
+    repository.add(auth_a)
+    auth_b = AuthorCore(name="Author 1")
+    with pytest.raises(ConflictError) as exc_info:
+        repository.add(auth_b)
+    assert exc_info.value.field == "name"
 
 
 def test_in_memory_author_repository_keeps_track_of_ids(repository):
@@ -39,8 +43,16 @@ def test_in_memory_author_repository_updates_author(repository):
     author = repository.add(AuthorCore(name="Original"))
     updated_author = repository.update(author.id, AuthorCore(name="Updated"))
     assert updated_author == Author(id=author.id, name="Updated")
-    assert repository.name_exists("Updated")
-    assert not repository.name_exists("Original")
+
+
+def test_in_memory_author_repository_raises_conflict_error_if_updating_to_existing_name(
+    repository,
+):
+    author = repository.add(AuthorCore(name="Author 1"))
+    repository.add(AuthorCore(name="Author 2"))
+    with pytest.raises(ConflictError) as exc_info:
+        repository.update(author.id, AuthorCore(name="Author 2"))
+    assert exc_info.value.field == "name"
 
 
 def test_in_memory_author_repository_gets_author_by_id(repository):

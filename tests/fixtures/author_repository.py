@@ -17,7 +17,6 @@ def mock_author_repository(author, get_authors_db_response):
     repo.add.return_value = author
     repo.get_by_id.return_value = author
     repo.update.return_value = author
-    repo.name_exists.return_value = False
     repo.id_exists.return_value = True
     repo.get_filtered.return_value = get_authors_db_response
     return repo

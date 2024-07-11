@@ -10,19 +10,20 @@ from bookshelf.api.dto import (
     Message,
 )
 from bookshelf.domain.author import Author
+from bookshelf.repositories.exceptions import ConflictError
 
 authors_router = APIRouter(prefix="/authors", tags=["authors"])
 
 
 @authors_router.post("/", status_code=HTTPStatus.CREATED.value, response_model=Author)
 def create_author(author: CreateAuthorRequest, author_repository: T_AuthorRepository):
-    if author_repository.name_exists(author.name):
+    try:
+        return author_repository.add(author.sanitized())
+    except ConflictError as e:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail="Author with this name already exists",
-        )
-    else:
-        return author_repository.add(author.sanitized())
+            detail=f"Author with this {e.field} already exists",
+        ) from e
 
 
 @authors_router.delete(
@@ -44,13 +45,14 @@ def update_author(
 ):
     if not author_repository.id_exists(author_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
-    elif author_repository.name_exists(author.name):
-        raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail="Author with this name already exists",
-        )
     else:
-        return author_repository.update(author_id, author.sanitized())
+        try:
+            return author_repository.update(author_id, author.sanitized())
+        except ConflictError as e:
+            raise HTTPException(
+                status_code=HTTPStatus.CONFLICT,
+                detail=f"Author with this {e.field} already exists",
+            ) from e
 
 
 @authors_router.get("/{author_id}", response_model=Author)
@@ -70,5 +72,5 @@ def get_authors(
     return GetAuthorsResponse(
         limit=query_parameters.limit,
         offset=query_parameters.offset,
-        **db_response.model_dump()
+        **db_response.model_dump(),
     )

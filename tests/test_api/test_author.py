@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from bookshelf.api.dto import GetAuthorsResponse
+from bookshelf.repositories.exceptions import ConflictError
 
 
 def test_creating_author_with_missing_fields_returns_unprocessable_entity(client):
@@ -32,7 +33,7 @@ def test_author_name_gets_sanitized_before_being_stored(client, mock_author_repo
 def test_creating_author_with_existing_name_returns_conflict(
     client, mock_author_repository
 ):
-    mock_author_repository.name_exists.return_value = True
+    mock_author_repository.add.side_effect = ConflictError("name")
 
     response = client.post("/authors", json={"name": "Andrew Hunt"})
     assert response.status_code == HTTPStatus.CONFLICT
@@ -101,7 +102,7 @@ def test_updating_author_with_nonexistent_id_returns_not_found(
 def test_updating_author_with_existing_name_returns_conflict(
     client, mock_author_repository
 ):
-    mock_author_repository.name_exists.return_value = True
+    mock_author_repository.update.side_effect = ConflictError("name")
 
     response = client.put("/authors/123", json={"name": "existing name"})
     assert response.status_code == HTTPStatus.CONFLICT
