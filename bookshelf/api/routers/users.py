@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 
 from bookshelf.api.dependencies import T_PasswordHandler, T_UserRepository
-from bookshelf.api.dto import CreateUserRequest, UserResponse
+from bookshelf.api.dto import CreateUserRequest, Message, UserResponse
 from bookshelf.api.exceptions import HttpConflictError
 from bookshelf.repositories.exceptions import ConflictError
 
@@ -49,3 +49,14 @@ def get_user(user_id: int, user_repository: T_UserRepository):
     if user is None:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     return user
+
+
+@users_router.delete(
+    "/{user_id}", status_code=HTTPStatus.OK.value, response_model=Message
+)
+def delete_user(user_id: int, user_repository: T_UserRepository):
+    if not user_repository.id_exists(user_id):
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+    else:
+        user_repository.delete(user_id)
+        return Message(message="User deleted")

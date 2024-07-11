@@ -138,3 +138,7 @@ def test_user_crud(end_to_end_client):
     response = end_to_end_client.get("/users/1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"id": 1, "username": "new user", "email": "a@b.com"}
+    # Delete
+    response = end_to_end_client.delete("/users/1")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"message": "User deleted"}

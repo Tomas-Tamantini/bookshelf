@@ -186,3 +186,22 @@ def test_getting_user_with_nonexistent_id_returns_not_found(
     mock_user_repository.get_by_id.return_value = None
     response = client.get("/users/123")
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_deleting_user_returns_status_ok(client):
+    response = client.delete("/users/123")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"message": "User deleted"}
+
+
+def test_deleting_user_delegates_to_repository(client, mock_user_repository):
+    client.delete("/users/123")
+    mock_user_repository.delete.assert_called_once_with(123)
+
+
+def test_deleting_user_with_nonexistent_id_returns_not_found(
+    client, mock_user_repository
+):
+    mock_user_repository.id_exists.return_value = False
+    response = client.delete("/users/123")
+    assert response.status_code == HTTPStatus.NOT_FOUND
