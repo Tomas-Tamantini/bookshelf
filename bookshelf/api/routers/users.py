@@ -20,7 +20,7 @@ def create_user(
 ):
     try:
         return user_repository.add(
-            user.sanitized().hash_password(password_handler.hash_password)
+            user.sanitized().hash_password(password_handler.hash)
         )
     except ConflictError as e:
         raise HttpConflictError("User", e.field) from e

@@ -118,8 +118,6 @@ def test_book_crud(end_to_end_client):
     }
 
 
-# TODO: Unskip
-@pytest.mark.skip("Not implemented yet")
 @pytest.mark.end_to_end
 def test_user_crud(end_to_end_client):
     # Create

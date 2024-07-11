@@ -52,9 +52,9 @@ def test_user_password_gets_hashed_before_being_stored(
 ):
     req = valid_user_request
     req["password"] = "password"
-    mock_password_handler.hash_password.return_value = "123"
+    mock_password_handler.hash.return_value = "123"
     client.post("/users", json=req)
-    assert mock_password_handler.hash_password.call_args[0][0] == "password"
+    assert mock_password_handler.hash.call_args[0][0] == "password"
     assert mock_user_repository.add.call_args[0][0].hashed_password == "123"
 
 

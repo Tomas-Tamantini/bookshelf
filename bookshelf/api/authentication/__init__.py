@@ -1,1 +1,1 @@
-from .password_handler import PasswordHandler, PwdHandler
+from .password_handler import PasswordHandler
