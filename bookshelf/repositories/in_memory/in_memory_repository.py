@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from bookshelf.repositories.exceptions import ConflictError
-from typing import Iterator, Optional, Any, Callable
 from dataclasses import dataclass
+from typing import Any, Callable, Iterator, Optional
+
+from bookshelf.repositories.exceptions import ConflictError
 
 
 @dataclass(frozen=True)
