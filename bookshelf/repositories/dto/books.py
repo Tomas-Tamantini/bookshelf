@@ -2,8 +2,6 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from bookshelf.domain.book import Book
-
 
 class GetBooksDBQueryParameters(BaseModel):
     limit: int
