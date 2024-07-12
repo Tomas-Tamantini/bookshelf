@@ -1,6 +1,7 @@
 from bookshelf.domain.book import Book, BookCore
 from bookshelf.repositories.dto import (
-    GetBooksDBQueryParameters,
+    BookFilters,
+    PaginationParameters,
     RepositoryPaginatedResponse,
 )
 from bookshelf.repositories.in_memory.in_memory_repository import (
@@ -21,28 +22,20 @@ class InMemoryBookRepository(InMemoryRepository[BookCore, Book]):
         return element.id
 
     def get_filtered(
-        self, query_parameters: GetBooksDBQueryParameters
+        self, pagination: PaginationParameters, filters: BookFilters
     ) -> RepositoryPaginatedResponse[Book]:
-        filtered = [
-            book for book in self._elements if self._matches(book, query_parameters)
-        ]
-        start_idx = query_parameters.offset
-        end_idx = start_idx + query_parameters.limit
+        filtered = [book for book in self._elements if self._matches(book, filters)]
+        start_idx = pagination.offset
+        end_idx = start_idx + pagination.limit
         return RepositoryPaginatedResponse[Book](
             elements=filtered[start_idx:end_idx], total=len(filtered)
         )
 
-    def _matches(self, book: Book, query_parameters: GetBooksDBQueryParameters) -> bool:
-        if (
-            query_parameters.title is not None
-            and query_parameters.title not in book.title
-        ):
+    def _matches(self, book: Book, filters: BookFilters) -> bool:
+        if filters.title is not None and filters.title not in book.title:
             return False
-        if (
-            query_parameters.author_id is not None
-            and query_parameters.author_id != book.author_id
-        ):
+        if filters.author_id is not None and filters.author_id != book.author_id:
             return False
-        if query_parameters.year is not None and query_parameters.year != book.year:
+        if filters.year is not None and filters.year != book.year:
             return False
         return True

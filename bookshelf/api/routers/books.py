@@ -79,10 +79,15 @@ def get_books(
     book_repository: T_BookRepository,
     query_parameters: GetBooksQueryParameters = Depends(),
 ):
-    db_query_parameters = query_parameters.sanitized()
-    db_response = book_repository.get_filtered(db_query_parameters)
+    pagination = query_parameters.pagination()
+    filters = query_parameters.filters()
+    db_response = book_repository.get_filtered(pagination, filters)
     return GetBooksResponse(
         books=db_response.elements,
         total=db_response.total,
-        **db_query_parameters.model_dump(),
+        limit=pagination.limit,
+        offset=pagination.offset,
+        title=filters.title,
+        author_id=filters.author_id,
+        year=filters.year,
     )

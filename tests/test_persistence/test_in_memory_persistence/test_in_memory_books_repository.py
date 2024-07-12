@@ -1,7 +1,7 @@
 import pytest
 
 from bookshelf.domain.book import Book, BookCore
-from bookshelf.repositories.dto import GetBooksDBQueryParameters
+from bookshelf.repositories.dto import BookFilters, PaginationParameters
 from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryBookRepository
 
@@ -65,11 +65,9 @@ def test_in_memory_book_repository_gets_filtered_and_paginated_books(repository)
     titles = ("abc", "aab", "bba", "ccc", "cab")
     for title in titles:
         repository.add(BookCore(title=title, author_id=1, year=2021))
-    result = repository.get_filtered(
-        GetBooksDBQueryParameters(
-            title="ab", limit=2, offset=1, author_id=None, year=None
-        )
-    )
+    pagination = PaginationParameters(limit=2, offset=1)
+    filters = BookFilters(title="ab", author_id=None, year=None)
+    result = repository.get_filtered(pagination, filters)
     assert result.total == 3
     assert result.elements == [
         Book(id=2, title="aab", author_id=1, year=2021),

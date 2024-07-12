@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 
 from bookshelf.api.dto.sanitize import sanitize_name
 from bookshelf.domain.book import Book, BookCore
-from bookshelf.repositories.dto import GetBooksDBQueryParameters
+from bookshelf.repositories.dto import BookFilters, PaginationParameters
 
 
 class CreateBookRequest(BookCore):
@@ -46,10 +46,11 @@ class GetBooksQueryParameters(BaseModel):
     author_id: Optional[int] = None
     year: Optional[int] = None
 
-    def sanitized(self) -> GetBooksDBQueryParameters:
-        return GetBooksDBQueryParameters(
-            limit=self.limit,
-            offset=self.offset,
+    def pagination(self) -> PaginationParameters:
+        return PaginationParameters(limit=self.limit, offset=self.offset)
+
+    def filters(self) -> BookFilters:
+        return BookFilters(
             title=(sanitize_name(self.title) if self.title is not None else self.title),
             author_id=self.author_id,
             year=self.year,

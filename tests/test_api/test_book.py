@@ -151,7 +151,7 @@ def test_getting_books_by_title_sanitizes_title_before_querying(
 ):
     client.get("/books?title=  The   Pragmatic Programmer  ")
     assert (
-        mock_book_repository.get_filtered.call_args[0][0].title
+        mock_book_repository.get_filtered.call_args[0][1].title
         == "the pragmatic programmer"
     )
 
@@ -173,6 +173,6 @@ def test_getting_books_returns_paginated_and_filtered_books(
             total=get_books_db_response.total,
         ).model_dump()
     )
-    assert mock_book_repository.get_filtered.call_args[0][0].title == "title"
-    assert mock_book_repository.get_filtered.call_args[0][0].year == 1999
+    assert mock_book_repository.get_filtered.call_args[0][1].title == "title"
+    assert mock_book_repository.get_filtered.call_args[0][1].year == 1999
     assert mock_book_repository.get_filtered.call_args[0][0].offset == 2
