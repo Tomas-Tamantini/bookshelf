@@ -1,9 +1,5 @@
 from bookshelf.domain.user import User, UserCore
-from bookshelf.repositories.dto import (
-    PaginationParameters,
-    RepositoryPaginatedResponse,
-    UserFilters,
-)
+from bookshelf.repositories.dto import UserFilters
 from bookshelf.repositories.in_memory.in_memory_repository import (
     InMemoryRepository,
     RepositoryField,

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Iterator, Optional
+
 from bookshelf.repositories.dto import PaginationParameters, RepositoryPaginatedResponse
 from bookshelf.repositories.exceptions import ConflictError
 

@@ -1,9 +1,5 @@
 from bookshelf.domain.author import Author, AuthorCore
-from bookshelf.repositories.dto import (
-    AuthorFilters,
-    PaginationParameters,
-    RepositoryPaginatedResponse,
-)
+from bookshelf.repositories.dto import AuthorFilters
 from bookshelf.repositories.in_memory.in_memory_repository import (
     InMemoryRepository,
     RepositoryField,
