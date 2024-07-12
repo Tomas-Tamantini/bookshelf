@@ -142,3 +142,26 @@ def test_user_crud(end_to_end_client):
     response = end_to_end_client.delete("/users/1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "User deleted"}
+    # Get by query parameters
+    usernames = ("Alice", "Bob", "Charlie", "Diana", "Alan")
+    for username in usernames:
+        end_to_end_client.post(
+            "/users/",
+            json={
+                "username": username,
+                "email": f"{username.lower()}@email.com",
+                "password": "password",
+            },
+        )
+    response = end_to_end_client.get("/users?username=Al&limit=2&offset=1")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        "limit": 2,
+        "offset": 1,
+        "total": 2,
+        "username": "al",
+        "email": None,
+        "users": [
+            {"id": 5, "username": "alan", "email": "alan@email.com"},
+        ],
+    }

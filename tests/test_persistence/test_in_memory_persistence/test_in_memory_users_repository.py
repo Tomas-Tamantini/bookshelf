@@ -1,6 +1,7 @@
 import pytest
 
 from bookshelf.domain.user import User, UserCore
+from bookshelf.repositories.dto import GetUsersDBQueryParameters
 from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryUserRepository
 
@@ -90,3 +91,19 @@ def test_in_memory_user_repository_gets_user_by_id(repository, user_core):
     user = user_core()
     user = repository.add(user)
     assert repository.get_by_id(user.id) == user
+
+
+def test_in_memory_user_repository_gets_filtered_users(repository):
+    names = ("abc", "aab", "bba", "ccc", "cab")
+    for name in names:
+        repository.add(
+            UserCore(username=name, email=f"{name}@mail.com", hashed_password="pass")
+        )
+    result = repository.get_filtered(
+        GetUsersDBQueryParameters(email="ab", offset=1, limit=2, username=None)
+    )
+    assert result.total == 3
+    assert result.users == [
+        User(id=2, username="aab", email="aab@mail.com", hashed_password="pass"),
+        User(id=5, username="cab", email="cab@mail.com", hashed_password="pass"),
+    ]

@@ -1,9 +1,15 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from bookshelf.api.dependencies import T_PasswordHandler, T_UserRepository
-from bookshelf.api.dto import CreateUserRequest, Message, UserResponse
+from bookshelf.api.dto import (
+    CreateUserRequest,
+    GetUsersQueryParameters,
+    GetUsersResponse,
+    Message,
+    UserResponse,
+)
 from bookshelf.api.exceptions import HttpConflictError
 from bookshelf.repositories.exceptions import ConflictError
 
@@ -60,3 +66,19 @@ def delete_user(user_id: int, user_repository: T_UserRepository):
     else:
         user_repository.delete(user_id)
         return Message(message="User deleted")
+
+
+@users_router.get("/", status_code=HTTPStatus.OK, response_model=GetUsersResponse)
+def get_users(
+    user_repository: T_UserRepository,
+    query_parameters: GetUsersQueryParameters = Depends(),
+):
+    db_query_parameters = query_parameters.sanitized()
+    db_response = user_repository.get_filtered(db_query_parameters)
+    return GetUsersResponse(
+        limit=db_query_parameters.limit,
+        offset=db_query_parameters.offset,
+        username=db_query_parameters.username,
+        email=db_query_parameters.email,
+        **db_response.model_dump(),
+    )

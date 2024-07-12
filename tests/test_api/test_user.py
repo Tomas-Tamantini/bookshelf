@@ -205,3 +205,34 @@ def test_deleting_user_with_nonexistent_id_returns_not_found(
     mock_user_repository.id_exists.return_value = False
     response = client.delete("/users/123")
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_getting_users_returns_status_ok(client):
+    response = client.get("/users")
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_getting_users_sanitizes_query_parameters_before_passing_to_repository(
+    client, mock_user_repository
+):
+    client.get("/users?username=  User  &email= MaiL  ")
+    assert mock_user_repository.get_filtered.call_args[0][0].username == "user"
+    assert mock_user_repository.get_filtered.call_args[0][0].email == "mail"
+
+
+def test_getting_users_returns_paginated_users_without_passwords(
+    client, mock_user_repository, get_users_db_response
+):
+    mock_user_repository.get_filtered.return_value = get_users_db_response
+    api_response = client.get("/users?limit=10&offset=20&username=user&email=mail")
+    assert api_response.json() == {
+        "limit": 10,
+        "offset": 20,
+        "username": "user",
+        "email": "mail",
+        **get_users_db_response.model_dump(),
+    }
+    assert mock_user_repository.get_filtered.call_args[0][0].limit == 10
+    assert mock_user_repository.get_filtered.call_args[0][0].offset == 20
+    assert mock_user_repository.get_filtered.call_args[0][0].username == "user"
+    assert mock_user_repository.get_filtered.call_args[0][0].email == "mail"
