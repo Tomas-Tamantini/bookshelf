@@ -216,8 +216,8 @@ def test_getting_users_sanitizes_query_parameters_before_passing_to_repository(
     client, mock_user_repository
 ):
     client.get("/users?username=  User  &email= MaiL  ")
-    assert mock_user_repository.get_filtered.call_args[0][0].username == "user"
-    assert mock_user_repository.get_filtered.call_args[0][0].email == "mail"
+    assert mock_user_repository.get_filtered.call_args[0][1].username == "user"
+    assert mock_user_repository.get_filtered.call_args[0][1].email == "mail"
 
 
 def test_getting_users_returns_paginated_users_without_passwords(
@@ -235,5 +235,5 @@ def test_getting_users_returns_paginated_users_without_passwords(
     }
     assert mock_user_repository.get_filtered.call_args[0][0].limit == 10
     assert mock_user_repository.get_filtered.call_args[0][0].offset == 20
-    assert mock_user_repository.get_filtered.call_args[0][0].username == "user"
-    assert mock_user_repository.get_filtered.call_args[0][0].email == "mail"
+    assert mock_user_repository.get_filtered.call_args[0][1].username == "user"
+    assert mock_user_repository.get_filtered.call_args[0][1].email == "mail"

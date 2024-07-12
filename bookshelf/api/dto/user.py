@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from bookshelf.api.dto.sanitize import sanitize_name
 from bookshelf.domain.user import UserCore, UserPublicInformation
-from bookshelf.repositories.dto import GetUsersDBQueryParameters
+from bookshelf.repositories.dto import PaginationParameters, UserFilters
 
 
 class CreateUserRequest(UserPublicInformation):
@@ -35,10 +35,11 @@ class GetUsersQueryParameters(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None
 
-    def sanitized(self) -> GetUsersDBQueryParameters:
-        return GetUsersDBQueryParameters(
-            limit=self.limit,
-            offset=self.offset,
+    def pagination(self) -> PaginationParameters:
+        return PaginationParameters(limit=self.limit, offset=self.offset)
+
+    def filters(self) -> UserFilters:
+        return UserFilters(
             username=(
                 sanitize_name(self.username) if self.username is not None else None
             ),

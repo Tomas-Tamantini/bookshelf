@@ -1,7 +1,7 @@
 import pytest
 
 from bookshelf.domain.user import User, UserCore
-from bookshelf.repositories.dto import GetUsersDBQueryParameters
+from bookshelf.repositories.dto import PaginationParameters, UserFilters
 from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryUserRepository
 
@@ -99,9 +99,9 @@ def test_in_memory_user_repository_gets_filtered_users(repository):
         repository.add(
             UserCore(username=name, email=f"{name}@mail.com", hashed_password="pass")
         )
-    result = repository.get_filtered(
-        GetUsersDBQueryParameters(email="ab", offset=1, limit=2, username=None)
-    )
+    pagination = PaginationParameters(limit=2, offset=1)
+    filters = UserFilters(email="ab", username=None)
+    result = repository.get_filtered(pagination, filters)
     assert result.total == 3
     assert result.elements == [
         User(id=2, username="aab", email="aab@mail.com", hashed_password="pass"),

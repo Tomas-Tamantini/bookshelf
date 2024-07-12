@@ -2,8 +2,9 @@ from typing import Optional, Protocol
 
 from bookshelf.domain.user import User, UserCore
 from bookshelf.repositories.dto import (
-    GetUsersDBQueryParameters,
+    PaginationParameters,
     RepositoryPaginatedResponse,
+    UserFilters,
 )
 
 
@@ -19,5 +20,5 @@ class UserRepository(Protocol):
     def delete(self, element_id: int) -> None: ...
 
     def get_filtered(
-        self, query_parameters: GetUsersDBQueryParameters
+        self, pagination: PaginationParameters, filters: UserFilters
     ) -> RepositoryPaginatedResponse[User]: ...

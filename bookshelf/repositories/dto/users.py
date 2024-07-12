@@ -3,8 +3,6 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class GetUsersDBQueryParameters(BaseModel):
-    limit: int
-    offset: int
+class UserFilters(BaseModel):
     username: Optional[str]
     email: Optional[str]

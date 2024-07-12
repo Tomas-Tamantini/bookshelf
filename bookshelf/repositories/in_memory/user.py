@@ -1,7 +1,8 @@
 from bookshelf.domain.user import User, UserCore
 from bookshelf.repositories.dto import (
-    GetUsersDBQueryParameters,
+    PaginationParameters,
     RepositoryPaginatedResponse,
+    UserFilters,
 )
 from bookshelf.repositories.in_memory.in_memory_repository import (
     InMemoryRepository,
@@ -24,26 +25,18 @@ class InMemoryUserRepository(InMemoryRepository[UserCore, User]):
         return element.id
 
     def get_filtered(
-        self, query_parameters: GetUsersDBQueryParameters
+        self, pagination: PaginationParameters, filters: UserFilters
     ) -> RepositoryPaginatedResponse[User]:
-        filtered = [
-            user for user in self._elements if self._matches(user, query_parameters)
-        ]
-        start_idx = query_parameters.offset
-        end_idx = start_idx + query_parameters.limit
+        filtered = [user for user in self._elements if self._matches(user, filters)]
+        start_idx = pagination.offset
+        end_idx = start_idx + pagination.limit
         return RepositoryPaginatedResponse[User](
             elements=filtered[start_idx:end_idx], total=len(filtered)
         )
 
-    def _matches(self, user: User, query_parameters: GetUsersDBQueryParameters) -> bool:
-        if (
-            query_parameters.username is not None
-            and query_parameters.username not in user.username
-        ):
+    def _matches(self, user: User, filters: UserFilters) -> bool:
+        if filters.username is not None and filters.username not in user.username:
             return False
-        if (
-            query_parameters.email is not None
-            and query_parameters.email not in user.email
-        ):
+        if filters.email is not None and filters.email not in user.email:
             return False
         return True

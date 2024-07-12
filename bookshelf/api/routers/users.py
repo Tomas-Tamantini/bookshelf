@@ -73,12 +73,18 @@ def get_users(
     user_repository: T_UserRepository,
     query_parameters: GetUsersQueryParameters = Depends(),
 ):
-    db_query_parameters = query_parameters.sanitized()
-    db_response = user_repository.get_filtered(db_query_parameters)
+    pagination = query_parameters.pagination()
+    filters = query_parameters.filters()
+    db_response = user_repository.get_filtered(pagination, filters)
     users = [
         UserResponse(id=user.id, username=user.username, email=user.email)
         for user in db_response.elements
     ]
     return GetUsersResponse(
-        total=db_response.total, users=users, **db_query_parameters.model_dump()
+        total=db_response.total,
+        users=users,
+        limit=pagination.limit,
+        offset=pagination.offset,
+        username=filters.username,
+        email=filters.email,
     )
