@@ -22,16 +22,16 @@ class InMemoryUserRepository:
         if self._email_exists(user.email):
             yield "email"
 
-    def add(self, user: UserCore) -> User:
-        for field in self._conflicting_fields(user):
+    def add(self, element: UserCore) -> User:
+        for field in self._conflicting_fields(element):
             raise ConflictError(field)
 
-        user_with_id = User(id=len(self._users) + 1, **user.model_dump())
-        self._users.append(user_with_id)
-        return user_with_id
+        user = User(id=len(self._users) + 1, **element.model_dump())
+        self._users.append(user)
+        return user
 
-    def id_exists(self, user_id: int) -> bool:
-        return any(user.id == user_id for user in self._users)
+    def id_exists(self, element_id: int) -> bool:
+        return any(user.id == element_id for user in self._users)
 
     def _name_changed(self, user_id: int, user: UserCore) -> bool:
         old_user = self.get_by_id(user_id)
@@ -41,21 +41,23 @@ class InMemoryUserRepository:
         old_user = self.get_by_id(user_id)
         return old_user.email != user.email
 
-    def update(self, user_id: int, user: UserCore) -> User:
-        conflicting_fields = list(self._conflicting_fields(user))
-        if self._name_changed(user_id, user) and "username" in conflicting_fields:
+    def update(self, element_id: int, element: UserCore) -> User:
+        conflicting_fields = list(self._conflicting_fields(element))
+        if self._name_changed(element_id, element) and "username" in conflicting_fields:
             raise ConflictError("username")
-        if self._email_changed(user_id, user) and "email" in conflicting_fields:
+        if self._email_changed(element_id, element) and "email" in conflicting_fields:
             raise ConflictError("email")
-        updated = User(id=user_id, **user.model_dump())
-        self._users = [updated if user.id == user_id else user for user in self._users]
+        updated = User(id=element_id, **element.model_dump())
+        self._users = [
+            updated if user.id == element_id else user for user in self._users
+        ]
         return updated
 
-    def get_by_id(self, user_id: int) -> Optional[User]:
-        return next((user for user in self._users if user.id == user_id), None)
+    def get_by_id(self, element_id: int) -> Optional[User]:
+        return next((user for user in self._users if user.id == element_id), None)
 
-    def delete(self, user_id: int) -> None:
-        self._users = [user for user in self._users if user.id != user_id]
+    def delete(self, element_id: int) -> None:
+        self._users = [user for user in self._users if user.id != element_id]
 
     def get_filtered(
         self, query_parameters: GetUsersDBQueryParameters
