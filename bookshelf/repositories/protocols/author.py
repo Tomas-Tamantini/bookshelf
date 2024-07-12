@@ -1,24 +1,10 @@
-from typing import Optional, Protocol
+from typing import Protocol
 
 from bookshelf.domain.author import Author, AuthorCore
-from bookshelf.repositories.dto import (
-    AuthorFilters,
-    PaginationParameters,
-    RepositoryPaginatedResponse,
-)
+from bookshelf.repositories.dto import AuthorFilters
+
+from .repository import Repository
 
 
-class AuthorRepository(Protocol):
-    def add(self, element: AuthorCore) -> Author: ...
-
-    def id_exists(self, element_id: int) -> bool: ...
-
-    def delete(self, element_id: int) -> None: ...
-
-    def update(self, element_id: int, element: AuthorCore) -> Author: ...
-
-    def get_by_id(self, element_id: int) -> Optional[Author]: ...
-
-    def get_filtered(
-        self, pagination: PaginationParameters, filters: AuthorFilters
-    ) -> RepositoryPaginatedResponse[Author]: ...
+class AuthorRepository(Repository[AuthorCore, Author, AuthorFilters], Protocol):
+    pass
