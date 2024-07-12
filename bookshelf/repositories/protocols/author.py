@@ -1,7 +1,10 @@
 from typing import Optional, Protocol
 
 from bookshelf.domain.author import Author, AuthorCore
-from bookshelf.repositories.dto import GetAuthorsDBQueryParameters, GetAuthorsDBResponse
+from bookshelf.repositories.dto import (
+    GetAuthorsDBQueryParameters,
+    RepositoryPaginatedResponse,
+)
 
 
 class AuthorRepository(Protocol):
@@ -17,4 +20,4 @@ class AuthorRepository(Protocol):
 
     def get_filtered(
         self, query_parameters: GetAuthorsDBQueryParameters
-    ) -> GetAuthorsDBResponse: ...
+    ) -> RepositoryPaginatedResponse[Author]: ...

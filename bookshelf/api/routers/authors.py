@@ -65,7 +65,7 @@ def get_authors(
 ):
     db_response = author_repository.get_filtered(query_parameters.sanitized())
     return GetAuthorsResponse(
-        limit=query_parameters.limit,
-        offset=query_parameters.offset,
-        **db_response.model_dump(),
+        authors=db_response.elements,
+        total=db_response.total,
+        **query_parameters.model_dump(),
     )

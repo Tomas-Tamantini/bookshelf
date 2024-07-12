@@ -65,8 +65,8 @@ def test_in_memory_author_repository_gets_filtered_and_paginated_authors(reposit
     names = ("abc", "aab", "bba", "ccc", "cab")
     for name in names:
         repository.add(AuthorCore(name=name))
-    resullt = repository.get_filtered(
+    result = repository.get_filtered(
         GetAuthorsDBQueryParameters(name="ab", limit=2, offset=1)
     )
-    assert resullt.total == 3
-    assert resullt.authors == [Author(id=2, name="aab"), Author(id=5, name="cab")]
+    assert result.total == 3
+    assert result.elements == [Author(id=2, name="aab"), Author(id=5, name="cab")]

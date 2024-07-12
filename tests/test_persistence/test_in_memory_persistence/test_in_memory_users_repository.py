@@ -103,7 +103,7 @@ def test_in_memory_user_repository_gets_filtered_users(repository):
         GetUsersDBQueryParameters(email="ab", offset=1, limit=2, username=None)
     )
     assert result.total == 3
-    assert result.users == [
+    assert result.elements == [
         User(id=2, username="aab", email="aab@mail.com", hashed_password="pass"),
         User(id=5, username="cab", email="cab@mail.com", hashed_password="pass"),
     ]

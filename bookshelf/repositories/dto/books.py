@@ -11,8 +11,3 @@ class GetBooksDBQueryParameters(BaseModel):
     title: Optional[str]
     author_id: Optional[int]
     year: Optional[int]
-
-
-class GetBooksDBResponse(BaseModel):
-    books: list[Book]
-    total: int

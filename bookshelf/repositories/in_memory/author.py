@@ -1,7 +1,10 @@
 from typing import Optional
 
 from bookshelf.domain.author import Author, AuthorCore
-from bookshelf.repositories.dto import GetAuthorsDBQueryParameters, GetAuthorsDBResponse
+from bookshelf.repositories.dto import (
+    GetAuthorsDBQueryParameters,
+    RepositoryPaginatedResponse,
+)
 from bookshelf.repositories.exceptions import ConflictError
 
 
@@ -45,12 +48,12 @@ class InMemoryAuthorRepository:
 
     def get_filtered(
         self, query_parameters: GetAuthorsDBQueryParameters
-    ) -> GetAuthorsDBResponse:
+    ) -> RepositoryPaginatedResponse[Author]:
         filtered = [
             author for author in self._authors if query_parameters.name in author.name
         ]
         start_idx = query_parameters.offset
         end_idx = start_idx + query_parameters.limit
-        return GetAuthorsDBResponse(
-            authors=filtered[start_idx:end_idx], total=len(filtered)
+        return RepositoryPaginatedResponse[Author](
+            elements=filtered[start_idx:end_idx], total=len(filtered)
         )

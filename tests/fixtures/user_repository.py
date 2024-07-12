@@ -2,13 +2,14 @@ from unittest.mock import Mock
 
 import pytest
 
-from bookshelf.repositories.dto import GetUsersDBResponse
+from bookshelf.domain.user import User
+from bookshelf.repositories.dto import RepositoryPaginatedResponse
 from bookshelf.repositories.protocols import UserRepository
 
 
 @pytest.fixture
 def get_users_db_response():
-    return GetUsersDBResponse(users=[], total=100)
+    return RepositoryPaginatedResponse[User](elements=[], total=100)
 
 
 @pytest.fixture

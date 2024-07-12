@@ -1,7 +1,10 @@
 from typing import Iterator, Optional
 
 from bookshelf.domain.user import User, UserCore
-from bookshelf.repositories.dto import GetUsersDBQueryParameters, GetUsersDBResponse
+from bookshelf.repositories.dto import (
+    GetUsersDBQueryParameters,
+    RepositoryPaginatedResponse,
+)
 from bookshelf.repositories.exceptions import ConflictError
 
 
@@ -61,14 +64,14 @@ class InMemoryUserRepository:
 
     def get_filtered(
         self, query_parameters: GetUsersDBQueryParameters
-    ) -> GetUsersDBResponse:
+    ) -> RepositoryPaginatedResponse[User]:
         filtered = [
             user for user in self._users if self._matches(user, query_parameters)
         ]
         start_idx = query_parameters.offset
         end_idx = start_idx + query_parameters.limit
-        return GetUsersDBResponse(
-            users=filtered[start_idx:end_idx], total=len(filtered)
+        return RepositoryPaginatedResponse[User](
+            elements=filtered[start_idx:end_idx], total=len(filtered)
         )
 
     def _matches(self, user: User, query_parameters: GetUsersDBQueryParameters) -> bool:

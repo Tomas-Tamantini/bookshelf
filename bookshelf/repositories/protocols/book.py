@@ -1,7 +1,10 @@
 from typing import Protocol
 
 from bookshelf.domain.book import Book, BookCore
-from bookshelf.repositories.dto import GetBooksDBQueryParameters, GetBooksDBResponse
+from bookshelf.repositories.dto import (
+    GetBooksDBQueryParameters,
+    RepositoryPaginatedResponse,
+)
 
 
 class BookRepository(Protocol):
@@ -17,4 +20,4 @@ class BookRepository(Protocol):
 
     def get_filtered(
         self, query_parameters: GetBooksDBQueryParameters
-    ) -> GetBooksDBResponse: ...
+    ) -> RepositoryPaginatedResponse[Book]: ...

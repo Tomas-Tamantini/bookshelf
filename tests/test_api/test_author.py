@@ -150,7 +150,10 @@ def test_getting_authors_returns_paginated_and_filtered_authors(
     assert (
         api_response.json()
         == GetAuthorsResponse(
-            limit=10, offset=20, **get_authors_db_response.model_dump()
+            limit=10,
+            offset=20,
+            authors=get_authors_db_response.elements,
+            total=get_authors_db_response.total,
         ).model_dump()
     )
     assert mock_author_repository.get_filtered.call_args[0][0].name == "andrew"

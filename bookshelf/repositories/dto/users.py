@@ -10,8 +10,3 @@ class GetUsersDBQueryParameters(BaseModel):
     offset: int
     username: Optional[str]
     email: Optional[str]
-
-
-class GetUsersDBResponse(BaseModel):
-    users: list[User]
-    total: int

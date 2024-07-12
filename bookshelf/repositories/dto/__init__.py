@@ -1,3 +1,4 @@
-from .authors import GetAuthorsDBQueryParameters, GetAuthorsDBResponse
-from .books import GetBooksDBQueryParameters, GetBooksDBResponse
-from .users import GetUsersDBQueryParameters, GetUsersDBResponse
+from .authors import GetAuthorsDBQueryParameters
+from .books import GetBooksDBQueryParameters
+from .paginated import RepositoryPaginatedResponse
+from .users import GetUsersDBQueryParameters

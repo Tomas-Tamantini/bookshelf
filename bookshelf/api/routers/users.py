@@ -75,10 +75,10 @@ def get_users(
 ):
     db_query_parameters = query_parameters.sanitized()
     db_response = user_repository.get_filtered(db_query_parameters)
+    users = [
+        UserResponse(id=user.id, username=user.username, email=user.email)
+        for user in db_response.elements
+    ]
     return GetUsersResponse(
-        limit=db_query_parameters.limit,
-        offset=db_query_parameters.offset,
-        username=db_query_parameters.username,
-        email=db_query_parameters.email,
-        **db_response.model_dump(),
+        total=db_response.total, users=users, **db_query_parameters.model_dump()
     )

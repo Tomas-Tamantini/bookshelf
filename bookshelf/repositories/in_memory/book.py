@@ -1,5 +1,8 @@
 from bookshelf.domain.book import Book, BookCore
-from bookshelf.repositories.dto import GetBooksDBQueryParameters, GetBooksDBResponse
+from bookshelf.repositories.dto import (
+    GetBooksDBQueryParameters,
+    RepositoryPaginatedResponse,
+)
 from bookshelf.repositories.exceptions import ConflictError
 
 
@@ -43,14 +46,14 @@ class InMemoryBookRepository:
 
     def get_filtered(
         self, query_parameters: GetBooksDBQueryParameters
-    ) -> GetBooksDBResponse:
+    ) -> RepositoryPaginatedResponse[Book]:
         filtered = [
             book for book in self._books if self._matches(book, query_parameters)
         ]
         start_idx = query_parameters.offset
         end_idx = start_idx + query_parameters.limit
-        return GetBooksDBResponse(
-            books=filtered[start_idx:end_idx], total=len(filtered)
+        return RepositoryPaginatedResponse[Book](
+            elements=filtered[start_idx:end_idx], total=len(filtered)
         )
 
     def _matches(self, book: Book, query_parameters: GetBooksDBQueryParameters) -> bool:

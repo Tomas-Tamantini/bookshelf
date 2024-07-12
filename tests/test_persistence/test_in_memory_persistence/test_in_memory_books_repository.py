@@ -71,7 +71,7 @@ def test_in_memory_book_repository_gets_filtered_and_paginated_books(repository)
         )
     )
     assert result.total == 3
-    assert result.books == [
+    assert result.elements == [
         Book(id=2, title="aab", author_id=1, year=2021),
         Book(id=5, title="cab", author_id=1, year=2021),
     ]

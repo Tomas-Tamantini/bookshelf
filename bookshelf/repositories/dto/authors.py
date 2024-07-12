@@ -7,8 +7,3 @@ class GetAuthorsDBQueryParameters(BaseModel):
     name: str
     limit: int
     offset: int
-
-
-class GetAuthorsDBResponse(BaseModel):
-    authors: list[Author]
-    total: int

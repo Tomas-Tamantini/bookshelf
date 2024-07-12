@@ -169,7 +169,8 @@ def test_getting_books_returns_paginated_and_filtered_books(
             title="title",
             year=1999,
             author_id=None,
-            **get_books_db_response.model_dump()
+            books=get_books_db_response.elements,
+            total=get_books_db_response.total,
         ).model_dump()
     )
     assert mock_book_repository.get_filtered.call_args[0][0].title == "title"

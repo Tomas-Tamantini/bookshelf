@@ -230,7 +230,8 @@ def test_getting_users_returns_paginated_users_without_passwords(
         "offset": 20,
         "username": "user",
         "email": "mail",
-        **get_users_db_response.model_dump(),
+        "total": get_users_db_response.total,
+        "users": get_users_db_response.elements,
     }
     assert mock_user_repository.get_filtered.call_args[0][0].limit == 10
     assert mock_user_repository.get_filtered.call_args[0][0].offset == 20
