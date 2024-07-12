@@ -10,7 +10,7 @@ from bookshelf.repositories.in_memory.in_memory_repository import (
 )
 
 
-class InMemoryAuthorRepository(InMemoryRepository[AuthorCore, Author]):
+class InMemoryAuthorRepository(InMemoryRepository[AuthorCore, Author, AuthorFilters]):
     def __init__(self) -> None:
         unique_fields = [RepositoryField("name", lambda author: author.name)]
         super().__init__(unique_fields)
@@ -21,12 +21,5 @@ class InMemoryAuthorRepository(InMemoryRepository[AuthorCore, Author]):
     def _get_id(self, element: Author) -> int:
         return element.id
 
-    def get_filtered(
-        self, pagination: PaginationParameters, filters: AuthorFilters
-    ) -> RepositoryPaginatedResponse[Author]:
-        filtered = [author for author in self._elements if filters.name in author.name]
-        start_idx = pagination.offset
-        end_idx = start_idx + pagination.limit
-        return RepositoryPaginatedResponse[Author](
-            elements=filtered[start_idx:end_idx], total=len(filtered)
-        )
+    def _matches(self, element: Author, filters: AuthorFilters) -> bool:
+        return filters.name in element.name

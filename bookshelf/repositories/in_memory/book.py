@@ -10,7 +10,7 @@ from bookshelf.repositories.in_memory.in_memory_repository import (
 )
 
 
-class InMemoryBookRepository(InMemoryRepository[BookCore, Book]):
+class InMemoryBookRepository(InMemoryRepository[BookCore, Book, BookFilters]):
     def __init__(self) -> None:
         unique_fields = [RepositoryField("title", lambda book: book.title)]
         super().__init__(unique_fields)
@@ -21,21 +21,11 @@ class InMemoryBookRepository(InMemoryRepository[BookCore, Book]):
     def _get_id(self, element: Book) -> int:
         return element.id
 
-    def get_filtered(
-        self, pagination: PaginationParameters, filters: BookFilters
-    ) -> RepositoryPaginatedResponse[Book]:
-        filtered = [book for book in self._elements if self._matches(book, filters)]
-        start_idx = pagination.offset
-        end_idx = start_idx + pagination.limit
-        return RepositoryPaginatedResponse[Book](
-            elements=filtered[start_idx:end_idx], total=len(filtered)
-        )
-
-    def _matches(self, book: Book, filters: BookFilters) -> bool:
-        if filters.title is not None and filters.title not in book.title:
+    def _matches(self, element: Book, filters: BookFilters) -> bool:
+        if filters.title is not None and filters.title not in element.title:
             return False
-        if filters.author_id is not None and filters.author_id != book.author_id:
+        if filters.author_id is not None and filters.author_id != element.author_id:
             return False
-        if filters.year is not None and filters.year != book.year:
+        if filters.year is not None and filters.year != element.year:
             return False
         return True

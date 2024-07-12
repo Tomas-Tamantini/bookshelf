@@ -10,7 +10,7 @@ from bookshelf.repositories.in_memory.in_memory_repository import (
 )
 
 
-class InMemoryUserRepository(InMemoryRepository[UserCore, User]):
+class InMemoryUserRepository(InMemoryRepository[UserCore, User, UserFilters]):
     def __init__(self) -> None:
         unique_fields = [
             RepositoryField("username", lambda user: user.username),
@@ -24,19 +24,9 @@ class InMemoryUserRepository(InMemoryRepository[UserCore, User]):
     def _get_id(self, element: User) -> int:
         return element.id
 
-    def get_filtered(
-        self, pagination: PaginationParameters, filters: UserFilters
-    ) -> RepositoryPaginatedResponse[User]:
-        filtered = [user for user in self._elements if self._matches(user, filters)]
-        start_idx = pagination.offset
-        end_idx = start_idx + pagination.limit
-        return RepositoryPaginatedResponse[User](
-            elements=filtered[start_idx:end_idx], total=len(filtered)
-        )
-
-    def _matches(self, user: User, filters: UserFilters) -> bool:
-        if filters.username is not None and filters.username not in user.username:
+    def _matches(self, element: User, filters: UserFilters) -> bool:
+        if filters.username is not None and filters.username not in element.username:
             return False
-        if filters.email is not None and filters.email not in user.email:
+        if filters.email is not None and filters.email not in element.email:
             return False
         return True
