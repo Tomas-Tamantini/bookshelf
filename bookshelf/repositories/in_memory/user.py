@@ -1,72 +1,33 @@
-from typing import Iterator, Optional
-
 from bookshelf.domain.user import User, UserCore
 from bookshelf.repositories.dto import (
     GetUsersDBQueryParameters,
     RepositoryPaginatedResponse,
 )
-from bookshelf.repositories.exceptions import ConflictError
+from bookshelf.repositories.in_memory.in_memory_repository import (
+    InMemoryRepository,
+    RepositoryField,
+)
 
 
-class InMemoryUserRepository:
+class InMemoryUserRepository(InMemoryRepository[UserCore, User]):
     def __init__(self) -> None:
-        self._users = []
-
-    def _username_exists(self, username: str) -> bool:
-        return any(user.username == username for user in self._users)
-
-    def _email_exists(self, email: str) -> bool:
-        return any(user.email == email for user in self._users)
-
-    def _conflicting_fields(self, user: UserCore) -> Iterator[str]:
-        if self._username_exists(user.username):
-            yield "username"
-
-        if self._email_exists(user.email):
-            yield "email"
-
-    def add(self, element: UserCore) -> User:
-        for field in self._conflicting_fields(element):
-            raise ConflictError(field)
-
-        user = User(id=len(self._users) + 1, **element.model_dump())
-        self._users.append(user)
-        return user
-
-    def id_exists(self, element_id: int) -> bool:
-        return any(user.id == element_id for user in self._users)
-
-    def _name_changed(self, user_id: int, user: UserCore) -> bool:
-        old_user = self.get_by_id(user_id)
-        return old_user.username != user.username
-
-    def _email_changed(self, user_id: int, user: UserCore) -> bool:
-        old_user = self.get_by_id(user_id)
-        return old_user.email != user.email
-
-    def update(self, element_id: int, element: UserCore) -> User:
-        conflicting_fields = list(self._conflicting_fields(element))
-        if self._name_changed(element_id, element) and "username" in conflicting_fields:
-            raise ConflictError("username")
-        if self._email_changed(element_id, element) and "email" in conflicting_fields:
-            raise ConflictError("email")
-        updated = User(id=element_id, **element.model_dump())
-        self._users = [
-            updated if user.id == element_id else user for user in self._users
+        unique_fields = [
+            RepositoryField("username", lambda user: user.username),
+            RepositoryField("email", lambda user: user.email),
         ]
-        return updated
+        super().__init__(unique_fields)
 
-    def get_by_id(self, element_id: int) -> Optional[User]:
-        return next((user for user in self._users if user.id == element_id), None)
+    def _put_id(self, element: UserCore, element_id: int) -> User:
+        return User(id=element_id, **element.model_dump())
 
-    def delete(self, element_id: int) -> None:
-        self._users = [user for user in self._users if user.id != element_id]
+    def _get_id(self, element: User) -> int:
+        return element.id
 
     def get_filtered(
         self, query_parameters: GetUsersDBQueryParameters
     ) -> RepositoryPaginatedResponse[User]:
         filtered = [
-            user for user in self._users if self._matches(user, query_parameters)
+            user for user in self._elements if self._matches(user, query_parameters)
         ]
         start_idx = query_parameters.offset
         end_idx = start_idx + query_parameters.limit

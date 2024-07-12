@@ -3,52 +3,28 @@ from bookshelf.repositories.dto import (
     GetBooksDBQueryParameters,
     RepositoryPaginatedResponse,
 )
-from bookshelf.repositories.exceptions import ConflictError
+from bookshelf.repositories.in_memory.in_memory_repository import (
+    InMemoryRepository,
+    RepositoryField,
+)
 
 
-class InMemoryBookRepository:
+class InMemoryBookRepository(InMemoryRepository[BookCore, Book]):
     def __init__(self) -> None:
-        self._books = []
+        unique_fields = [RepositoryField("title", lambda book: book.title)]
+        super().__init__(unique_fields)
 
-    def add(self, element: BookCore) -> Book:
-        if self._title_exists(element.title):
-            raise ConflictError("title")
-        book = Book(id=len(self._books) + 1, **element.model_dump())
-        self._books.append(book)
-        return book
+    def _put_id(self, element: BookCore, element_id: int) -> Book:
+        return Book(id=element_id, **element.model_dump())
 
-    def _title_exists(self, title: str) -> bool:
-        return any(book.title == title for book in self._books)
-
-    def id_exists(self, element_id: int) -> bool:
-        return any(book.id == element_id for book in self._books)
-
-    def delete(self, element_id: int) -> None:
-        self._books = [book for book in self._books if book.id != element_id]
-
-    def _title_changed(self, book_id: int, book: BookCore) -> bool:
-        old_book = self.get_by_id(book_id)
-        return old_book.title != book.title
-
-    def update(self, element_id: int, element: BookCore) -> Book:
-        if self._title_changed(element_id, element) and self._title_exists(
-            element.title
-        ):
-            raise ConflictError("title")
-        updated = Book(id=element_id, **element.model_dump())
-        self._books = [
-            updated if book.id == element_id else book for book in self._books
-        ]
-        return updated
-
-    def get_by_id(self, element_id: int) -> Book:
-        return next((book for book in self._books if book.id == element_id), None)
+    def _get_id(self, element: Book) -> int:
+        return element.id
 
     def get_filtered(
         self, query_parameters: GetBooksDBQueryParameters
     ) -> RepositoryPaginatedResponse[Book]:
         filtered = [
-            book for book in self._books if self._matches(book, query_parameters)
+            book for book in self._elements if self._matches(book, query_parameters)
         ]
         start_idx = query_parameters.offset
         end_idx = start_idx + query_parameters.limit
