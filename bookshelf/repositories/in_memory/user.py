@@ -1,6 +1,7 @@
 from typing import Iterator, Optional
 
 from bookshelf.domain.user import User, UserCore
+from bookshelf.repositories.dto import GetUsersDBQueryParameters, GetUsersDBResponse
 from bookshelf.repositories.exceptions import ConflictError
 
 
@@ -55,3 +56,28 @@ class InMemoryUserRepository:
 
     def delete(self, user_id: int) -> None:
         self._users = [user for user in self._users if user.id != user_id]
+
+    def get_filtered(
+        self, query_parameters: GetUsersDBQueryParameters
+    ) -> GetUsersDBResponse:
+        filtered = [
+            user for user in self._users if self._matches(user, query_parameters)
+        ]
+        start_idx = query_parameters.offset
+        end_idx = start_idx + query_parameters.limit
+        return GetUsersDBResponse(
+            users=filtered[start_idx:end_idx], total=len(filtered)
+        )
+
+    def _matches(self, user: User, query_parameters: GetUsersDBQueryParameters) -> bool:
+        if (
+            query_parameters.username is not None
+            and query_parameters.username not in user.username
+        ):
+            return False
+        if (
+            query_parameters.email is not None
+            and query_parameters.email not in user.email
+        ):
+            return False
+        return True

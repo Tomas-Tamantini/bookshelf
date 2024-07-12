@@ -1,6 +1,7 @@
 from typing import Optional, Protocol
 
 from bookshelf.domain.user import User, UserCore
+from bookshelf.repositories.dto import GetUsersDBQueryParameters, GetUsersDBResponse
 
 
 class UserRepository(Protocol):
@@ -13,3 +14,7 @@ class UserRepository(Protocol):
     def get_by_id(self, user_id: int) -> Optional[User]: ...
 
     def delete(self, user_id: int) -> None: ...
+
+    def get_filtered(
+        self, query_parameters: GetUsersDBQueryParameters
+    ) -> GetUsersDBResponse: ...

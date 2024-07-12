@@ -8,4 +8,4 @@ from tests.fixtures.book import book, valid_book_request
 from tests.fixtures.book_repository import get_books_db_response, mock_book_repository
 from tests.fixtures.client import client, end_to_end_client
 from tests.fixtures.user import user, user_core, valid_user_request
-from tests.fixtures.user_repository import mock_user_repository
+from tests.fixtures.user_repository import get_users_db_response, mock_user_repository
