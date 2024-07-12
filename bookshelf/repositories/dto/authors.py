@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 
 
-class GetAuthorsDBQueryParameters(BaseModel):
+class AuthorsFilter(BaseModel):
     name: str
-    limit: int
-    offset: int

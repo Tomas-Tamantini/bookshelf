@@ -1,4 +1,4 @@
-from .authors import GetAuthorsDBQueryParameters
+from .authors import AuthorsFilter
 from .books import GetBooksDBQueryParameters
-from .pagination import RepositoryPaginatedResponse
+from .pagination import PaginationParameters, RepositoryPaginatedResponse
 from .users import GetUsersDBQueryParameters

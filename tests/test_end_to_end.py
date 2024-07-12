@@ -40,6 +40,7 @@ def test_author_crud(end_to_end_client):
         "limit": 2,
         "offset": 1,
         "total": 3,
+        "name": "ma",
         "authors": [
             {"id": 3, "name": "robert c martin"},
             {"id": 4, "name": "mary shelley"},

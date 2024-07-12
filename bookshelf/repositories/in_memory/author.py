@@ -1,6 +1,7 @@
 from bookshelf.domain.author import Author, AuthorCore
 from bookshelf.repositories.dto import (
-    GetAuthorsDBQueryParameters,
+    AuthorsFilter,
+    PaginationParameters,
     RepositoryPaginatedResponse,
 )
 from bookshelf.repositories.in_memory.in_memory_repository import (
@@ -21,13 +22,11 @@ class InMemoryAuthorRepository(InMemoryRepository[AuthorCore, Author]):
         return element.id
 
     def get_filtered(
-        self, query_parameters: GetAuthorsDBQueryParameters
+        self, pagination: PaginationParameters, filters: AuthorsFilter
     ) -> RepositoryPaginatedResponse[Author]:
-        filtered = [
-            author for author in self._elements if query_parameters.name in author.name
-        ]
-        start_idx = query_parameters.offset
-        end_idx = start_idx + query_parameters.limit
+        filtered = [author for author in self._elements if filters.name in author.name]
+        start_idx = pagination.offset
+        end_idx = start_idx + pagination.limit
         return RepositoryPaginatedResponse[Author](
             elements=filtered[start_idx:end_idx], total=len(filtered)
         )

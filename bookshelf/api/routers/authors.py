@@ -63,9 +63,13 @@ def get_authors(
     author_repository: T_AuthorRepository,
     query_parameters: GetAuthorsQueryParameters = Depends(),
 ):
-    db_response = author_repository.get_filtered(query_parameters.sanitized())
+    pagination = query_parameters.pagination()
+    authors_filter = query_parameters.authors_filter()
+    db_response = author_repository.get_filtered(pagination, authors_filter)
     return GetAuthorsResponse(
         authors=db_response.elements,
         total=db_response.total,
-        **query_parameters.model_dump(),
+        limit=pagination.limit,
+        offset=pagination.offset,
+        name=authors_filter.name,
     )
