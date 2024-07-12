@@ -1,4 +1,2 @@
-from .authors import AuthorFilters
-from .books import BookFilters
+from .filters import AuthorFilters, BookFilters, UserFilters
 from .pagination import PaginationParameters, RepositoryPaginatedResponse
-from .users import UserFilters
