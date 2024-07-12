@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 
-class AuthorsFilter(BaseModel):
+class AuthorFilters(BaseModel):
     name: str

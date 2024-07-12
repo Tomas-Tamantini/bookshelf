@@ -64,12 +64,12 @@ def get_authors(
     query_parameters: GetAuthorsQueryParameters = Depends(),
 ):
     pagination = query_parameters.pagination()
-    authors_filter = query_parameters.authors_filter()
-    db_response = author_repository.get_filtered(pagination, authors_filter)
+    filters = query_parameters.filters()
+    db_response = author_repository.get_filtered(pagination, filters)
     return GetAuthorsResponse(
         authors=db_response.elements,
         total=db_response.total,
         limit=pagination.limit,
         offset=pagination.offset,
-        name=authors_filter.name,
+        name=filters.name,
     )

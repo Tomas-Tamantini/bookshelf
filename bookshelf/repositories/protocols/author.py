@@ -2,7 +2,7 @@ from typing import Optional, Protocol
 
 from bookshelf.domain.author import Author, AuthorCore
 from bookshelf.repositories.dto import (
-    AuthorsFilter,
+    AuthorFilters,
     PaginationParameters,
     RepositoryPaginatedResponse,
 )
@@ -20,5 +20,5 @@ class AuthorRepository(Protocol):
     def get_by_id(self, element_id: int) -> Optional[Author]: ...
 
     def get_filtered(
-        self, pagination: PaginationParameters, filter: AuthorsFilter
+        self, pagination: PaginationParameters, filters: AuthorFilters
     ) -> RepositoryPaginatedResponse[Author]: ...

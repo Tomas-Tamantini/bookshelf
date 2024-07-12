@@ -1,7 +1,7 @@
 import pytest
 
 from bookshelf.domain.author import Author, AuthorCore
-from bookshelf.repositories.dto import AuthorsFilter, PaginationParameters
+from bookshelf.repositories.dto import AuthorFilters, PaginationParameters
 from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryAuthorRepository
 
@@ -66,7 +66,7 @@ def test_in_memory_author_repository_gets_filtered_and_paginated_authors(reposit
     for name in names:
         repository.add(AuthorCore(name=name))
     pagination = PaginationParameters(limit=2, offset=1)
-    authors_filter = AuthorsFilter(name="ab")
+    authors_filter = AuthorFilters(name="ab")
     result = repository.get_filtered(pagination, authors_filter)
     assert result.total == 3
     assert result.elements == [Author(id=2, name="aab"), Author(id=5, name="cab")]

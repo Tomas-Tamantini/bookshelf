@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from bookshelf.api.dto.sanitize import sanitize_name
 from bookshelf.domain.author import Author, AuthorCore
-from bookshelf.repositories.dto import AuthorsFilter, PaginationParameters
+from bookshelf.repositories.dto import AuthorFilters, PaginationParameters
 
 
 class CreateAuthorRequest(AuthorCore):
@@ -17,8 +17,8 @@ class GetAuthorsQueryParameters(BaseModel):
     limit: int = 20
     offset: int = 0
 
-    def authors_filter(self) -> AuthorsFilter:
-        return AuthorsFilter(name=sanitize_name(self.name))
+    def filters(self) -> AuthorFilters:
+        return AuthorFilters(name=sanitize_name(self.name))
 
     def pagination(self) -> PaginationParameters:
         return PaginationParameters(limit=self.limit, offset=self.offset)
