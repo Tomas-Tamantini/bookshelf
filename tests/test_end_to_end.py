@@ -166,3 +166,19 @@ def test_user_crud(end_to_end_client):
             {"id": 5, "username": "alan", "email": "alan@email.com"},
         ],
     }
+
+
+@pytest.mark.end_to_end
+def test_login(end_to_end_client):
+    # Create user
+    end_to_end_client.post(
+        "/users/",
+        json={"username": "user", "email": "a@b.com", "password": "123"},
+    )
+    # Login
+    response = end_to_end_client.post(
+        "/auth/login", data={"username": "a@b.com", "password": "123"}
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert "access_token" in response.json()
+    assert "refresh_token" in response.json()
