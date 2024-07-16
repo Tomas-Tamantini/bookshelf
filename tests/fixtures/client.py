@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from bookshelf.api.dependencies import (
     get_author_repository,
     get_book_repository,
+    get_jwt_handler,
     get_password_handler,
     get_user_repository,
 )
@@ -21,12 +22,14 @@ def client(
     mock_book_repository,
     mock_user_repository,
     mock_password_handler,
+    mock_jwt_handler,
 ):
     with TestClient(app) as client:
         app.dependency_overrides[get_author_repository] = lambda: mock_author_repository
         app.dependency_overrides[get_book_repository] = lambda: mock_book_repository
         app.dependency_overrides[get_user_repository] = lambda: mock_user_repository
         app.dependency_overrides[get_password_handler] = lambda: mock_password_handler
+        app.dependency_overrides[get_jwt_handler] = lambda: mock_jwt_handler
         yield client
         app.dependency_overrides.clear()
 
