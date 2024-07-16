@@ -19,5 +19,6 @@ def mock_user_repository(user, get_users_db_response):
     repo.update.return_value = user
     repo.id_exists.return_value = True
     repo.get_by_id.return_value = user
+    repo.get_by_email.return_value = user
     repo.get_filtered.return_value = get_users_db_response
     return repo

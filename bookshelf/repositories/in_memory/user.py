@@ -1,5 +1,7 @@
+from typing import Optional
+
 from bookshelf.domain.user import User, UserCore
-from bookshelf.repositories.dto import UserFilters
+from bookshelf.repositories.dto import PaginationParameters, UserFilters
 from bookshelf.repositories.in_memory.in_memory_repository import (
     InMemoryRepository,
     RepositoryField,
@@ -26,3 +28,10 @@ class InMemoryUserRepository(InMemoryRepository[UserCore, User, UserFilters]):
         if filters.email is not None and filters.email not in element.email:
             return False
         return True
+
+    def get_by_email(self, email: str) -> Optional[User]:
+        users = self.get_filtered(
+            pagination=PaginationParameters(limit=1, offset=0),
+            filters=UserFilters(username=None, email=email),
+        )
+        return users.elements[0] if users.elements else None

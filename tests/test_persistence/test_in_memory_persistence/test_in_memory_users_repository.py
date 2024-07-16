@@ -91,6 +91,14 @@ def test_in_memory_user_repository_gets_user_by_id(repository, user_core):
     user = user_core()
     user = repository.add(user)
     assert repository.get_by_id(user.id) == user
+    assert repository.get_by_id(100) is None
+
+
+def test_in_memory_user_repository_gets_user_by_email(repository, user_core):
+    user = user_core(email="existing@mail.com")
+    user = repository.add(user)
+    assert repository.get_by_email(user.email) == user
+    assert repository.get_by_email("bad@mail.com") is None
 
 
 def test_in_memory_user_repository_gets_filtered_users(repository):
