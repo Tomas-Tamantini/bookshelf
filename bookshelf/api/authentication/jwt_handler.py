@@ -2,7 +2,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional, Protocol
 
-from jwt import encode
+from jwt import (
+    DecodeError,
+    ExpiredSignatureError,
+    ImmatureSignatureError,
+    decode,
+    encode,
+)
 
 
 @dataclass(frozen=True)
@@ -76,4 +82,11 @@ class PyJWTHandler:
         )
 
     def get_subject(self, token: str) -> str:
-        raise NotImplementedError()
+        try:
+            return decode(token, self._secret, algorithms=[self._algorithm])["sub"]
+        except ExpiredSignatureError:
+            raise BadTokenError("Token has expired")
+        except ImmatureSignatureError:
+            raise BadTokenError("Token is not yet valid")
+        except DecodeError:
+            raise BadTokenError("Token is invalid")

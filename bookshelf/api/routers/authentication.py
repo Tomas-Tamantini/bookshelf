@@ -33,10 +33,10 @@ def login(
 def refresh(request: RefreshTokenRequest, jwt_handler: T_JWTHandler):
     try:
         subject = jwt_handler.get_subject(request.refresh_token)
-    except BadTokenError:
+    except BadTokenError as e:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
-            detail="Invalid token",
+            detail=str(e),
         )
     else:
         return jwt_handler.create_access_token(subject)

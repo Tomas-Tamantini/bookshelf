@@ -35,7 +35,6 @@ Project decisions:
     12/Jul/2024: Extracted most of the functionalities of the in-memory repositories to a base class. Collapsed all repository protocols into one using generic types
     
     TODO:
-        - Refresh token endpoint
         - Implement suggested test cases (https://fastapidozero.dunossauro.com/14/#cenarios-de-teste)
         - Protect enpoints with authentication
         - Protect endpoints with authorization

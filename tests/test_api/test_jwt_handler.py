@@ -1,7 +1,10 @@
-from freezegun import freeze_time
-from jwt import decode
+from datetime import datetime
 
-from bookshelf.api.authentication import PyJWTHandler
+import pytest
+from freezegun import freeze_time
+from jwt import decode, encode
+
+from bookshelf.api.authentication import BadTokenError, PyJWTHandler
 
 _DEFAULT_SECRET = "secret"
 _DEFAULT_ALGORITHM = "HS256"
@@ -26,6 +29,19 @@ def _decode(token: str) -> dict:
         algorithms=[_DEFAULT_ALGORITHM],
         options={"verify_exp": False, "verify_nbf": False},
     )
+
+
+def _encode(
+    not_before: datetime = datetime(2023, 1, 1, 0, 0, 0),
+    expiration: datetime = datetime(2024, 1, 1, 0, 0, 0),
+    subject: str = "John Doe",
+):
+    payload = {
+        "sub": subject,
+        "exp": expiration,
+        "nbf": not_before,
+    }
+    return encode(payload, _DEFAULT_SECRET, algorithm=_DEFAULT_ALGORITHM)
 
 
 def test_jwt_handler_creates_access_token_with_type_bearer():
@@ -78,3 +94,32 @@ def test_jwt_refresh_token_expires_x_minutes_after_access_token():
         ).create_token_pair("test-subject")
         decoded_refresh = _decode(token_pair.refresh_token)
         assert decoded_refresh["exp"] == 1609462800
+
+
+def test_jwt_raises_bad_token_if_cannot_decode_token():
+    with pytest.raises(BadTokenError):
+        _jwt_handler().get_subject("invalid-token")
+
+
+def test_jwt_handler_raises_bad_token_if_decoding_token_before_nbf():
+    token = _encode(not_before=datetime(2023, 1, 1, 0, 0, 0))
+    with freeze_time("2022-12-31 23:59:59"):
+        with pytest.raises(BadTokenError):
+            _jwt_handler().get_subject(token)
+
+
+def test_jwt_handler_raises_bad_token_if_decoding_token_after_exp():
+    token = _encode(expiration=datetime(2023, 1, 1, 0, 0, 0))
+    with freeze_time("2023-1-1 00:00:01"):
+        with pytest.raises(BadTokenError):
+            _jwt_handler().get_subject(token)
+
+
+def test_jwt_handler_gets_subject_from_valid_token():
+    token = _encode(
+        not_before=datetime(2023, 1, 1, 0, 0, 0),
+        expiration=datetime(2024, 1, 1, 0, 0, 0),
+        subject="John Doe",
+    )
+    with freeze_time("2023-1-1 00:00:00"):
+        assert _jwt_handler().get_subject(token) == "John Doe"

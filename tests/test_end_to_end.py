@@ -1,6 +1,10 @@
+from datetime import datetime, timedelta
 from http import HTTPStatus
 
 import pytest
+from freezegun import freeze_time
+
+from bookshelf.settings import Settings
 
 
 def _post_author(client, name):
@@ -182,3 +186,32 @@ def test_login(end_to_end_client):
     assert response.status_code == HTTPStatus.OK
     assert "access_token" in response.json()
     assert "refresh_token" in response.json()
+
+
+@pytest.mark.end_to_end
+def test_refresh_token(end_to_end_client):
+    # Create user
+    end_to_end_client.post(
+        "/users/",
+        json={"username": "user", "email": "a@b.com", "password": "123"},
+    )
+    login_time = datetime(2021, 1, 1, 0, 0, 0)
+    # Login
+    with freeze_time(login_time):
+        response = end_to_end_client.post(
+            "/auth/login", data={"username": "a@b.com", "password": "123"}
+        )
+        refresh_token = response.json()["refresh_token"]
+
+    # Refresh token
+    access_expiration_minutes = Settings().ACCESS_TOKEN_EXPIRATION_MINUTES
+    refresh_expiration_minutes = Settings().REFRESH_TOKEN_EXPIRATION_MINUTES
+    valid_interval = (access_expiration_minutes + refresh_expiration_minutes) // 2
+    new_time = login_time + timedelta(minutes=valid_interval)
+    with freeze_time(new_time):
+        response = end_to_end_client.post(
+            "/auth/refresh", json={"refresh_token": refresh_token}
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert "access_token" in response.json()
+        assert "refresh_token" not in response.json()

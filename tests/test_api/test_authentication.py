@@ -51,10 +51,10 @@ def test_refresh_token_with_bad_schema_returns_unprocessable_entity(client):
 
 
 def test_refresh_token_with_bad_token_returns_unauthorized(client, mock_jwt_handler):
-    mock_jwt_handler.get_subject.side_effect = BadTokenError
+    mock_jwt_handler.get_subject.side_effect = BadTokenError("bad token error msg")
     response = client.post("auth/refresh", json={"refresh_token": "bad_token"})
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json() == {"detail": "Invalid token"}
+    assert response.json() == {"detail": "bad token error msg"}
     assert mock_jwt_handler.get_subject.call_args[0][0] == "bad_token"
 
 
