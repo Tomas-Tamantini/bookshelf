@@ -37,6 +37,7 @@ Project decisions:
 
     TODO:
         - Implement suggested test cases (https://fastapidozero.dunossauro.com/14/#cenarios-de-teste)
+        - Mutation tests
         - Protect endpoints with authorization
         - Create relational DB
         - Create docker compose
