@@ -6,6 +6,7 @@ Project decisions:
     - Not using a Unit of work pattern
     - Explicitely query database to check for conflicts, rather than raising errors (avoid using errors for control, but break the ask-dont-tell principle)
     - Leaving the DB for last (developing with just in-memory implementation of the repositories)
+    - Using both an access token (short-lived) and a refresh token (long-lived)
 
 
     - A LOT of dependency injection (Authentication, authorization, repositories, etc.), making most tests very fast
@@ -32,3 +33,4 @@ Project decisions:
 
     11/Jul/2024: Decided to revert the decision of checking for conflict in the API layer, and delegate it to repository layer, getting rid of methods like "name_exists", "email_exists", etc. Now the repository raises an error
     12/Jul/2024: Extracted most of the functionalities of the in-memory repositories to a base class. Collapsed all repository protocols into one using generic types
+    
