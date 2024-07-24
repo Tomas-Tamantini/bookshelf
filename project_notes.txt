@@ -39,7 +39,6 @@ Project decisions:
         - Implement suggested test cases (https://fastapidozero.dunossauro.com/14/#cenarios-de-teste)
         - Protect enpoints with authentication
         - Protect endpoints with authorization
-        - Create dockerfile
         - Create relational DB
         - Create docker compose
         - Create frontend
