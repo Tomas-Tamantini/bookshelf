@@ -4,6 +4,7 @@ from .get_authentication_services import (
     get_jwt_handler,
     get_password_handler,
 )
+from .get_current_user import T_CurrentUser, get_current_user
 from .get_repositories import (
     T_AuthorRepository,
     T_BookRepository,

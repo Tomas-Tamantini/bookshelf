@@ -1,8 +1,10 @@
+from typing import Protocol
 from unittest.mock import Mock
 
 import pytest
 
 from bookshelf.api.authentication import JWTHandler, PasswordHandler, TokenPair
+from bookshelf.domain.user import User
 
 
 @pytest.fixture
@@ -20,3 +22,14 @@ def mock_jwt_handler():
     )
     handler.get_subject.return_value = "test_subject"
     return handler
+
+
+class _AuthenticatedUserGenerator(Protocol):
+    def get(self) -> User: ...
+
+
+@pytest.fixture
+def mock_authenticated_user_generator(user):
+    generator = Mock(spec=_AuthenticatedUserGenerator)
+    generator.get.return_value = user
+    return generator

@@ -1,4 +1,8 @@
-from tests.fixtures.authentication import mock_jwt_handler, mock_password_handler
+from tests.fixtures.authentication import (
+    mock_authenticated_user_generator,
+    mock_jwt_handler,
+    mock_password_handler,
+)
 from tests.fixtures.author import author
 from tests.fixtures.author_repository import (
     get_authors_db_response,
