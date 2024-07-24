@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional, Protocol
+from zoneinfo import ZoneInfo
 
 from jwt import (
     DecodeError,
@@ -48,7 +49,7 @@ class PyJWTHandler:
         self._refresh_token_expiration_minutes = refresh_token_expiration_minutes
 
     def _expiration(self, duration_minutes: int) -> datetime:
-        return datetime.now() + timedelta(minutes=duration_minutes)
+        return datetime.now(tz=ZoneInfo("UTC")) + timedelta(minutes=duration_minutes)
 
     def _build_token(
         self,
