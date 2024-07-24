@@ -1,7 +1,9 @@
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from bookshelf.api.dependencies import (
+    T_CurrentUser,
     get_author_repository,
     get_book_repository,
     get_current_user,
@@ -51,3 +53,20 @@ def end_to_end_client():
         app.dependency_overrides[get_user_repository] = lambda: user_repository
         yield client
         app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def dummy_auth_route_client(mock_jwt_handler, mock_user_repository):
+    fake_app = FastAPI()
+
+    @fake_app.get("/dummy", status_code=200)
+    def dummy_route(current_user: T_CurrentUser):
+        return {"dummy": "endpoint"}
+
+    with TestClient(fake_app) as client:
+        fake_app.dependency_overrides[get_jwt_handler] = lambda: mock_jwt_handler
+        fake_app.dependency_overrides[get_user_repository] = (
+            lambda: mock_user_repository
+        )
+        yield client
+        fake_app.dependency_overrides.clear()

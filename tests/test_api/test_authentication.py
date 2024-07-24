@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from bookshelf.api.authentication import BadTokenError, Token, TokenPair
+from bookshelf.api.exceptions import CredentialsError
 
 
 def test_login_with_bad_schema_returns_unprocessable_entity(client):
@@ -70,3 +71,42 @@ def test_refresh_token_with_good_token_returns_new_access_token(
         "access_token": "new_access_token",
         "token_type": "bearer",
     }
+
+
+def test_endpoints_that_require_authentication_return_unauthorized_if_no_token(
+    dummy_auth_route_client,
+):
+    response = dummy_auth_route_client.get("/dummy", headers={})
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+
+def test_endpoints_that_require_authentication_return_unauthorized_if_bad_token(
+    dummy_auth_route_client, mock_jwt_handler
+):
+    mock_jwt_handler.get_subject.side_effect = BadTokenError()
+    response = dummy_auth_route_client.get(
+        "/dummy", headers={"Authorization": "Bearer bad_token"}
+    )
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert mock_jwt_handler.get_subject.call_args[0][0] == "bad_token"
+
+
+def test_endpoints_that_require_authentication_return_unauthorized_if_bad_email(
+    dummy_auth_route_client, mock_jwt_handler, mock_user_repository
+):
+    mock_jwt_handler.get_subject.return_value = "bad@mail.com"
+    mock_user_repository.get_by_email.return_value = None
+    response = dummy_auth_route_client.get(
+        "/dummy", headers={"Authorization": "Bearer good_token"}
+    )
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+
+def test_endpoints_that_require_authentication_run_normally_if_good_token(
+    dummy_auth_route_client, mock_user_repository, user
+):
+    mock_user_repository.get_by_email.return_value = user
+    response = dummy_auth_route_client.get(
+        "/dummy", headers={"Authorization": "Bearer good_token"}
+    )
+    assert response.status_code == HTTPStatus.OK
