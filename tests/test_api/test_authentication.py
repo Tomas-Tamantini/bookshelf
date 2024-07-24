@@ -2,8 +2,8 @@ from http import HTTPStatus
 
 import pytest
 
-from bookshelf.api.authentication import BadTokenError, Token, TokenPair
-from bookshelf.api.exceptions import CredentialsError
+from bookshelf.api.authentication import Token, TokenPair
+from bookshelf.api.exceptions import BadTokenError, CredentialsError
 
 
 def test_login_with_bad_schema_returns_unprocessable_entity(client):

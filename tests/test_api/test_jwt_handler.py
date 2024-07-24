@@ -4,7 +4,8 @@ import pytest
 from freezegun import freeze_time
 from jwt import decode, encode
 
-from bookshelf.api.authentication import BadTokenError, PyJWTHandler
+from bookshelf.api.authentication import PyJWTHandler
+from bookshelf.api.exceptions import BadTokenError
 
 _DEFAULT_SECRET = "secret"
 _DEFAULT_ALGORITHM = "HS256"

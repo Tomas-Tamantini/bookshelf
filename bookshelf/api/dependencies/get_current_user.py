@@ -3,10 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from bookshelf.api.authentication import BadTokenError
 from bookshelf.api.dependencies.get_authentication_services import T_JWTHandler
 from bookshelf.api.dependencies.get_repositories import T_UserRepository
-from bookshelf.api.exceptions import CredentialsError
+from bookshelf.api.exceptions import BadTokenError, CredentialsError
 from bookshelf.domain.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")

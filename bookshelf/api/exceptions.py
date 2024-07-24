@@ -18,3 +18,7 @@ class CredentialsError(HTTPException):
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+class BadTokenError(Exception):
+    pass

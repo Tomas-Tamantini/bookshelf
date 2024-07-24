@@ -11,6 +11,8 @@ from jwt import (
     encode,
 )
 
+from bookshelf.api.exceptions import BadTokenError
+
 
 @dataclass(frozen=True)
 class Token:
@@ -21,10 +23,6 @@ class Token:
 @dataclass(frozen=True)
 class TokenPair(Token):
     refresh_token: str
-
-
-class BadTokenError(Exception):
-    pass
 
 
 class JWTHandler(Protocol):

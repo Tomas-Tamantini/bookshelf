@@ -3,9 +3,10 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from bookshelf.api.authentication import BadTokenError, Token, TokenPair
+from bookshelf.api.authentication import Token, TokenPair
 from bookshelf.api.dependencies import T_JWTHandler, T_PasswordHandler, T_UserRepository
 from bookshelf.api.dto import RefreshTokenRequest
+from bookshelf.api.exceptions import BadTokenError
 
 authentication_router = APIRouter(prefix="/auth", tags=["auth"])
 
