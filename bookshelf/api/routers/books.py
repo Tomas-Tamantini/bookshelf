@@ -2,7 +2,11 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from bookshelf.api.dependencies import T_AuthorRepository, T_BookRepository
+from bookshelf.api.dependencies import (
+    T_AuthorRepository,
+    T_BookRepository,
+    T_CurrentUser,
+)
 from bookshelf.api.dto import (
     CreateBookRequest,
     GetBooksQueryParameters,
@@ -21,6 +25,7 @@ def create_book(
     book: CreateBookRequest,
     book_repository: T_BookRepository,
     author_repository: T_AuthorRepository,
+    current_user: T_CurrentUser,
 ):
     if not author_repository.id_exists(book.author_id):
         raise HTTPException(
@@ -35,7 +40,9 @@ def create_book(
 
 
 @books_router.delete("/{book_id}", status_code=HTTPStatus.OK.value)
-def delete_book(book_id: int, book_repository: T_BookRepository):
+def delete_book(
+    book_id: int, book_repository: T_BookRepository, current_user: T_CurrentUser
+):
     if not book_repository.id_exists(book_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     else:
@@ -49,6 +56,7 @@ def update_book(
     book: PatchBookRequest,
     book_repository: T_BookRepository,
     author_repository: T_AuthorRepository,
+    current_user: T_CurrentUser,
 ):
     if book.author_id is not None and not author_repository.id_exists(book.author_id):
         raise HTTPException(

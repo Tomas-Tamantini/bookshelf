@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from bookshelf.api.dependencies import T_AuthorRepository
+from bookshelf.api.dependencies import T_AuthorRepository, T_CurrentUser
 from bookshelf.api.dto import (
     CreateAuthorRequest,
     GetAuthorsQueryParameters,
@@ -17,7 +17,11 @@ authors_router = APIRouter(prefix="/authors", tags=["authors"])
 
 
 @authors_router.post("/", status_code=HTTPStatus.CREATED.value, response_model=Author)
-def create_author(author: CreateAuthorRequest, author_repository: T_AuthorRepository):
+def create_author(
+    author: CreateAuthorRequest,
+    author_repository: T_AuthorRepository,
+    current_user: T_CurrentUser,
+):
     try:
         return author_repository.add(author.sanitized())
     except ConflictError as e:
@@ -27,7 +31,9 @@ def create_author(author: CreateAuthorRequest, author_repository: T_AuthorReposi
 @authors_router.delete(
     "/{author_id}", status_code=HTTPStatus.OK.value, response_model=Message
 )
-def delete_author(author_id: int, author_repository: T_AuthorRepository):
+def delete_author(
+    author_id: int, author_repository: T_AuthorRepository, current_user: T_CurrentUser
+):
     if not author_repository.id_exists(author_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     else:
@@ -39,7 +45,10 @@ def delete_author(author_id: int, author_repository: T_AuthorRepository):
     "/{author_id}", status_code=HTTPStatus.OK.value, response_model=Author
 )
 def update_author(
-    author_id: int, author: CreateAuthorRequest, author_repository: T_AuthorRepository
+    author_id: int,
+    author: CreateAuthorRequest,
+    author_repository: T_AuthorRepository,
+    current_user: T_CurrentUser,
 ):
     if not author_repository.id_exists(author_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)

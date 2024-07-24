@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+import pytest
+
 from bookshelf.api.authentication import BadTokenError, Token, TokenPair
 from bookshelf.api.exceptions import CredentialsError
 
@@ -114,11 +116,28 @@ def test_endpoints_that_require_authentication_run_normally_if_good_token(
     assert response.status_code == HTTPStatus.OK
 
 
+@pytest.mark.parametrize(
+    "protected_request",
+    [
+        lambda client: client.post("/authors", json={"name": "Andrew Hunt"}),
+        lambda client: client.delete("/authors/1"),
+        lambda client: client.put("/authors/1", json={"name": "Andrew Hunt"}),
+        lambda client: client.post(
+            "/books",
+            json={"title": "The Pragmatic Programmer", "year": 1999, "author_id": 1},
+        ),
+        lambda client: client.delete("/books/1"),
+        lambda client: client.patch("/books/1", json={"year": 2000}),
+        lambda client: client.put(
+            "/users/1", json={"email": "a@b.com", "username": "a", "password": "b"}
+        ),
+        lambda client: client.delete("/users/1"),
+    ],
+)
 def test_endpoints_that_require_authentication_return_unauthorized_if_not_authenticated(
-    client, mock_authenticated_user_generator
+    protected_request, client, mock_authenticated_user_generator
 ):
     mock_authenticated_user_generator.get.side_effect = CredentialsError()
-    # TODO: User pytest.parametrize to loop through all endpoints that require authentication
-    response = client.post("/authors", json={"name": "Andrew Hunt"})
+    response = protected_request(client)
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {"detail": "Could not validate credentials"}

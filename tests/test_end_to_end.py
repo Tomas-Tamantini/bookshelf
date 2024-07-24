@@ -7,18 +7,43 @@ from freezegun import freeze_time
 from bookshelf.settings import Settings
 
 
-def _post_author(client, name):
-    return client.post("/authors/", json={"name": name})
+def _post_author(client, name, token):
+    return client.post(
+        "/authors/",
+        json={"name": name},
+        headers={"Authorization": f"Bearer {token}"},
+    )
 
 
+# TODO: Remove all the duplicate headers
+# TODO: Extract prerequisites into fixtures
 @pytest.mark.end_to_end
 def test_author_crud(end_to_end_client):
+    # Prerequisite: Create user and login
+    # Create user
+    end_to_end_client.post(
+        "/users/",
+        json={"username": "user", "email": "a@b.com", "password": "123"},
+    )
+    # Login
+    response = end_to_end_client.post(
+        "/auth/login", data={"username": "a@b.com", "password": "123"}
+    )
+    token = response.json()["access_token"]
     # Create
-    response = end_to_end_client.post("/authors/", json={"name": "Clarice Lispector"})
+    response = end_to_end_client.post(
+        "/authors/",
+        json={"name": "Clarice Lispector"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {"id": 1, "name": "clarice lispector"}
     # Update
-    response = end_to_end_client.put("/authors/1", json={"name": "manuel bandeira"})
+    response = end_to_end_client.put(
+        "/authors/1",
+        json={"name": "manuel bandeira"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"id": 1, "name": "manuel bandeira"}
     # Read by ID
@@ -26,7 +51,9 @@ def test_author_crud(end_to_end_client):
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"id": 1, "name": "manuel bandeira"}
     # Delete
-    response = end_to_end_client.delete("/authors/1")
+    response = end_to_end_client.delete(
+        "/authors/1", headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "Author deleted"}
     # Get by query parameters
@@ -37,7 +64,7 @@ def test_author_crud(end_to_end_client):
         "Mary Shelley",
     )
     for name in names:
-        _post_author(end_to_end_client, name)
+        _post_author(end_to_end_client, name, token)
     response = end_to_end_client.get("/authors?name=Ma&limit=2&offset=1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
@@ -54,13 +81,29 @@ def test_author_crud(end_to_end_client):
 
 @pytest.mark.end_to_end
 def test_book_crud(end_to_end_client):
-    # Prerequisite: Create author
-    author = end_to_end_client.post("/authors/", json={"name": "Andrew Hunt"})
+    # Prerequisite: Create user, login and create author
+    # Create user
+    end_to_end_client.post(
+        "/users/",
+        json={"username": "user", "email": "a@b.com", "password": "123"},
+    )
+    # Login
+    response = end_to_end_client.post(
+        "/auth/login", data={"username": "a@b.com", "password": "123"}
+    )
+    token = response.json()["access_token"]
+    # Create author
+    author = end_to_end_client.post(
+        "/authors/",
+        json={"name": "Andrew Hunt"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
     author_id = author.json()["id"]
     # Create
     response = end_to_end_client.post(
         "/books/",
         json={"title": "The Pragmatic Programmer", "year": 1999, "author_id": 1},
+        headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {
@@ -70,7 +113,9 @@ def test_book_crud(end_to_end_client):
         "author_id": author_id,
     }
     # Update
-    response = end_to_end_client.patch("/books/1", json={"year": 2000})
+    response = end_to_end_client.patch(
+        "/books/1", json={"year": 2000}, headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
         "id": 1,
@@ -88,7 +133,9 @@ def test_book_crud(end_to_end_client):
         "author_id": author_id,
     }
     # Delete
-    response = end_to_end_client.delete("/books/1")
+    response = end_to_end_client.delete(
+        "/books/1", headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "Book deleted"}
     # Get by query parameters
@@ -102,6 +149,7 @@ def test_book_crud(end_to_end_client):
         end_to_end_client.post(
             "/books/",
             json={"title": title, "year": 2000, "author_id": author_id},
+            headers={"Authorization": f"Bearer {token}"},
         )
     response = end_to_end_client.get("/books?title=Clean&limit=123&offset=1")
     assert response.status_code == HTTPStatus.OK
@@ -132,10 +180,16 @@ def test_user_crud(end_to_end_client):
     )
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {"id": 1, "username": "user", "email": "a@b.com"}
+    # Login
+    response = end_to_end_client.post(
+        "/auth/login", data={"username": "a@b.com", "password": "password"}
+    )
+    token = response.json()["access_token"]
     # Update
     response = end_to_end_client.put(
         "/users/1",
         json={"username": " New User ", "email": "a@b.com", "password": "password"},
+        headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"id": 1, "username": "new user", "email": "a@b.com"}
@@ -144,7 +198,9 @@ def test_user_crud(end_to_end_client):
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"id": 1, "username": "new user", "email": "a@b.com"}
     # Delete
-    response = end_to_end_client.delete("/users/1")
+    response = end_to_end_client.delete(
+        "/users/1", headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {"message": "User deleted"}
     # Get by query parameters

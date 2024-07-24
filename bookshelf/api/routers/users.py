@@ -2,7 +2,11 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from bookshelf.api.dependencies import T_PasswordHandler, T_UserRepository
+from bookshelf.api.dependencies import (
+    T_CurrentUser,
+    T_PasswordHandler,
+    T_UserRepository,
+)
 from bookshelf.api.dto import (
     CreateUserRequest,
     GetUsersQueryParameters,
@@ -38,6 +42,7 @@ def update_user(
     user: CreateUserRequest,
     user_repository: T_UserRepository,
     password_handler: T_PasswordHandler,
+    current_user: T_CurrentUser,
 ):
     if not user_repository.id_exists(user_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
@@ -60,7 +65,9 @@ def get_user(user_id: int, user_repository: T_UserRepository):
 @users_router.delete(
     "/{user_id}", status_code=HTTPStatus.OK.value, response_model=Message
 )
-def delete_user(user_id: int, user_repository: T_UserRepository):
+def delete_user(
+    user_id: int, user_repository: T_UserRepository, current_user: T_CurrentUser
+):
     if not user_repository.id_exists(user_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     else:
