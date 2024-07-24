@@ -18,4 +18,5 @@ def mock_jwt_handler():
     handler.create_token_pair.return_value = TokenPair(
         access_token="access_token", refresh_token="refresh_token", token_type="bearer"
     )
+    handler.get_subject.return_value = "test_subject"
     return handler

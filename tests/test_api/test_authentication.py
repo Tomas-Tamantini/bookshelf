@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from bookshelf.api.authentication import TokenPair
+from bookshelf.api.authentication import BadTokenError, Token, TokenPair
 
 
 def test_login_with_bad_schema_returns_unprocessable_entity(client):
@@ -41,5 +41,32 @@ def test_login_with_good_credentials_returns_jwt_access_and_refresh_tokens(
     assert response.json() == {
         "access_token": "access_token",
         "refresh_token": "refresh_token",
+        "token_type": "bearer",
+    }
+
+
+def test_refresh_token_with_bad_schema_returns_unprocessable_entity(client):
+    response = client.post("auth/refresh", json={})
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+def test_refresh_token_with_bad_token_returns_unauthorized(client, mock_jwt_handler):
+    mock_jwt_handler.get_subject.side_effect = BadTokenError
+    response = client.post("auth/refresh", json={"refresh_token": "bad_token"})
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {"detail": "Invalid token"}
+    assert mock_jwt_handler.get_subject.call_args[0][0] == "bad_token"
+
+
+def test_refresh_token_with_good_token_returns_new_access_token(
+    client, mock_jwt_handler
+):
+    mock_jwt_handler.create_access_token.return_value = Token(
+        access_token="new_access_token", token_type="bearer"
+    )
+    response = client.post("auth/refresh", json={"refresh_token": "good_token"})
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        "access_token": "new_access_token",
         "token_type": "bearer",
     }

@@ -3,8 +3,9 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from bookshelf.api.authentication import TokenPair
+from bookshelf.api.authentication import BadTokenError, Token, TokenPair
 from bookshelf.api.dependencies import T_JWTHandler, T_PasswordHandler, T_UserRepository
+from bookshelf.api.dto import RefreshTokenRequest
 
 authentication_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -26,3 +27,16 @@ def login(
         )
     else:
         return jwt_handler.create_token_pair(user.id)
+
+
+@authentication_router.post("/refresh", response_model=Token)
+def refresh(request: RefreshTokenRequest, jwt_handler: T_JWTHandler):
+    try:
+        subject = jwt_handler.get_subject(request.refresh_token)
+    except BadTokenError:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    else:
+        return jwt_handler.create_access_token(subject)

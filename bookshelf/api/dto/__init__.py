@@ -1,3 +1,4 @@
+from .authentication import RefreshTokenRequest
 from .author import CreateAuthorRequest, GetAuthorsQueryParameters, GetAuthorsResponse
 from .book import (
     CreateBookRequest,

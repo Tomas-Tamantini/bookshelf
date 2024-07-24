@@ -16,10 +16,16 @@ class TokenPair(Token):
     refresh_token: str
 
 
+class BadTokenError(Exception):
+    pass
+
+
 class JWTHandler(Protocol):
     def create_access_token(self, subject: str) -> Token: ...
 
     def create_token_pair(self, subject: str) -> TokenPair: ...
+
+    def get_subject(self, token: str) -> str: ...
 
 
 class PyJWTHandler:
@@ -68,3 +74,6 @@ class PyJWTHandler:
             refresh_token=refresh_token,
             token_type=token.token_type,
         )
+
+    def get_subject(self, token: str) -> str:
+        raise NotImplementedError()
