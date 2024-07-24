@@ -9,3 +9,12 @@ class HttpConflictError(HTTPException):
             status_code=HTTPStatus.CONFLICT,
             detail=f"{resource_name} with this {field} already exists",
         )
+
+
+class CredentialsError(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
