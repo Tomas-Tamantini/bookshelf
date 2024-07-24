@@ -33,7 +33,8 @@ Project decisions:
 
     11/Jul/2024: Decided to revert the decision of checking for conflict in the API layer, and delegate it to repository layer, getting rid of methods like "name_exists", "email_exists", etc. Now the repository raises an error
     12/Jul/2024: Extracted most of the functionalities of the in-memory repositories to a base class. Collapsed all repository protocols into one using generic types
-    
+    24/Jul/2024: Dockerize even before connecting to a relational database (so just the Dockerfile is needed, not docker compose)
+
     TODO:
         - Implement suggested test cases (https://fastapidozero.dunossauro.com/14/#cenarios-de-teste)
         - Protect enpoints with authentication
