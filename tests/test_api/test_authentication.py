@@ -29,8 +29,9 @@ def test_login_with_bad_password_returns_unauthorized(client, mock_password_hand
 
 
 def test_login_with_good_credentials_returns_jwt_access_and_refresh_tokens(
-    client, mock_jwt_handler
+    client, mock_jwt_handler, mock_user_repository, user
 ):
+    mock_user_repository.get_by_email.return_value = user
     mock_jwt_handler.create_token_pair.return_value = TokenPair(
         access_token="access_token", refresh_token="refresh_token", token_type="bearer"
     )
@@ -44,6 +45,7 @@ def test_login_with_good_credentials_returns_jwt_access_and_refresh_tokens(
         "refresh_token": "refresh_token",
         "token_type": "bearer",
     }
+    assert mock_jwt_handler.create_token_pair.call_args[0][0] == user.email
 
 
 def test_refresh_token_with_bad_schema_returns_unprocessable_entity(client):
@@ -110,3 +112,13 @@ def test_endpoints_that_require_authentication_run_normally_if_good_token(
         "/dummy", headers={"Authorization": "Bearer good_token"}
     )
     assert response.status_code == HTTPStatus.OK
+
+
+def test_endpoints_that_require_authentication_return_unauthorized_if_not_authenticated(
+    client, mock_authenticated_user_generator
+):
+    mock_authenticated_user_generator.get.side_effect = CredentialsError()
+    # TODO: User pytest.parametrize to loop through all endpoints that require authentication
+    response = client.post("/authors", json={"name": "Andrew Hunt"})
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {"detail": "Could not validate credentials"}

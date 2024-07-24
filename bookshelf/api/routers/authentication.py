@@ -26,7 +26,7 @@ def login(
             detail="Incorrect email or password",
         )
     else:
-        return jwt_handler.create_token_pair(user.id)
+        return jwt_handler.create_token_pair(user.email)
 
 
 @authentication_router.post("/refresh", response_model=Token)
