@@ -116,6 +116,21 @@ def test_updating_user_with_existing_email_returns_conflict(
     assert response.json() == {"detail": "User with this email already exists"}
 
 
+def test_updating_user_with_insufficient_permissions_returns_forbidden(
+    client,
+    mock_authenticated_user_generator,
+    mock_update_user_authorization,
+    user,
+    valid_user_request,
+):
+    fake_user = user
+    mock_update_user_authorization.has_permission.return_value = False
+    mock_authenticated_user_generator.get.return_value = fake_user
+    response = client.put("/users/123", json=valid_user_request)
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert mock_update_user_authorization.has_permission.call_args[0][0] == fake_user
+
+
 def test_updating_user_returns_status_ok(client, valid_user_request):
     response = client.put("/users/123", json=valid_user_request)
     assert response.status_code == HTTPStatus.OK
@@ -205,6 +220,26 @@ def test_deleting_user_with_nonexistent_id_returns_not_found(
     mock_user_repository.id_exists.return_value = False
     response = client.delete("/users/123")
     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_deleting_user_with_insufficient_permissions_returns_forbidden(
+    client,
+    mock_authenticated_user_generator,
+    mock_delete_user_authorization,
+    user,
+):
+    fake_user = user
+    mock_authenticated_user_generator.get.return_value = fake_user
+    mock_delete_user_authorization.has_permission.return_value = False
+    response = client.delete("/users/123")
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert mock_delete_user_authorization.has_permission.call_args[0][0] == fake_user
+
+
+def test_deleting_valid_user_returns_status_ok(client):
+    response = client.delete("/users/123")
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {"message": "User deleted"}
 
 
 def test_getting_users_returns_status_ok(client):

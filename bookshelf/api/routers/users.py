@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from bookshelf.api.dependencies import (
     T_CurrentUser,
+    T_DeleteUserAuthorization,
     T_PasswordHandler,
+    T_UpdateUserAuthorization,
     T_UserRepository,
 )
 from bookshelf.api.dto import (
@@ -43,8 +45,11 @@ def update_user(
     user_repository: T_UserRepository,
     password_handler: T_PasswordHandler,
     current_user: T_CurrentUser,
+    authorization: T_UpdateUserAuthorization,
 ):
-    if not user_repository.id_exists(user_id):
+    if not authorization.has_permission(current_user):
+        raise HTTPException(status_code=HTTPStatus.FORBIDDEN)
+    elif not user_repository.id_exists(user_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     try:
         return user_repository.update(
@@ -66,9 +71,14 @@ def get_user(user_id: int, user_repository: T_UserRepository):
     "/{user_id}", status_code=HTTPStatus.OK.value, response_model=Message
 )
 def delete_user(
-    user_id: int, user_repository: T_UserRepository, current_user: T_CurrentUser
+    user_id: int,
+    user_repository: T_UserRepository,
+    current_user: T_CurrentUser,
+    authorization: T_DeleteUserAuthorization,
 ):
-    if not user_repository.id_exists(user_id):
+    if not authorization.has_permission(current_user):
+        raise HTTPException(status_code=HTTPStatus.FORBIDDEN)
+    elif not user_repository.id_exists(user_id):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
     else:
         user_repository.delete(user_id)
