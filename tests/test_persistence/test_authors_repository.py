@@ -3,14 +3,24 @@ import pytest
 from bookshelf.domain.author import Author, AuthorCore
 from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.relational import RelationalAuthorRepository
+from bookshelf.repositories.in_memory import InMemoryAuthorRepository
 
 
 @pytest.fixture
-def repository(db_session):
+def relational_repository(db_session):
     return RelationalAuthorRepository(db_session)
 
 
-# TODO: Merge with in-memory test, using pytest.parametrize
+@pytest.fixture
+def in_memory_repository():
+    return InMemoryAuthorRepository()
+
+
+@pytest.fixture(params=["relational_repository", "in_memory_repository"])
+def repository(request):
+    return request.getfixturevalue(request.param)
+
+
 def test_adding_author_increments_id(repository):
     auth_1 = repository.add(AuthorCore(name="Author 1"))
     assert auth_1 == Author(id=1, name="Author 1")
