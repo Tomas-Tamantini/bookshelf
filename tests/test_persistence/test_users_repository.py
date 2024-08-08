@@ -4,14 +4,25 @@ from bookshelf.domain.user import User, UserCore
 from bookshelf.repositories.dto import PaginationParameters, UserFilters
 from bookshelf.repositories.exceptions import ConflictError
 from bookshelf.repositories.in_memory import InMemoryUserRepository
+from bookshelf.repositories.relational import RelationalUserRepository
 
 
 @pytest.fixture
-def repository():
+def relational_repository(db_session):
+    return RelationalUserRepository(db_session)
+
+
+@pytest.fixture
+def in_memory_repository():
     return InMemoryUserRepository()
 
 
-def test_adding_user_in_memory_increments_id(repository, user_core):
+@pytest.fixture(params=["relational_repository", "in_memory_repository"])
+def repository(request):
+    return request.getfixturevalue(request.param)
+
+
+def test_adding_user_increments_id(repository, user_core):
     req_1 = user_core(email="u1@mail.com", username="user1")
     user_1 = repository.add(req_1)
     assert user_1 == User(id=1, **req_1.model_dump())
@@ -42,21 +53,21 @@ def test_adding_user_with_existing_email_in_repository_raises_conflict_error(
     assert exc_info.value.field == "email"
 
 
-def test_in_memory_user_repository_keeps_track_of_ids(repository, user_core):
+def test_user_repository_keeps_track_of_ids(repository, user_core):
     user = user_core()
     repository.add(user)
     assert repository.id_exists(1)
     assert not repository.id_exists(2)
 
 
-def test_in_memory_user_repository_deletes_user(repository, user_core):
+def test_user_repository_deletes_user(repository, user_core):
     user = user_core()
     user = repository.add(user)
     repository.delete(user.id)
     assert not repository.id_exists(user.id)
 
 
-def test_in_memory_user_repository_updates_user(repository, user_core):
+def test_user_repository_updates_user(repository, user_core):
     user = user_core()
     user = repository.add(user)
     updated_user = repository.update(user.id, user_core(username="Updated"))
@@ -65,7 +76,7 @@ def test_in_memory_user_repository_updates_user(repository, user_core):
     )
 
 
-def test_in_memory_user_repository_raises_conflict_error_if_updating_to_existing_name(
+def test_user_repository_raises_conflict_error_if_updating_to_existing_name(
     repository, user_core
 ):
     user = user_core(username="user1", email="a@b.com")
@@ -76,7 +87,7 @@ def test_in_memory_user_repository_raises_conflict_error_if_updating_to_existing
     assert exc_info.value.field == "username"
 
 
-def test_in_memory_user_repository_raises_conflict_error_if_updating_to_existing_email(
+def test_user_repository_raises_conflict_error_if_updating_to_existing_email(
     repository, user_core
 ):
     user = user_core(username="user1", email="a@b.com")
@@ -87,21 +98,21 @@ def test_in_memory_user_repository_raises_conflict_error_if_updating_to_existing
     assert exc_info.value.field == "email"
 
 
-def test_in_memory_user_repository_gets_user_by_id(repository, user_core):
+def test_user_repository_gets_user_by_id(repository, user_core):
     user = user_core()
     user = repository.add(user)
     assert repository.get_by_id(user.id) == user
     assert repository.get_by_id(100) is None
 
 
-def test_in_memory_user_repository_gets_user_by_email(repository, user_core):
+def test_user_repository_gets_user_by_email(repository, user_core):
     user = user_core(email="existing@mail.com")
     user = repository.add(user)
     assert repository.get_by_email(user.email) == user
     assert repository.get_by_email("bad@mail.com") is None
 
 
-def test_in_memory_user_repository_gets_filtered_users(repository):
+def test_user_repository_gets_filtered_users(repository):
     names = ("abc", "aab", "bba", "ccc", "cab")
     for name in names:
         repository.add(
