@@ -4,8 +4,7 @@ from bookshelf.domain.user import User
 
 
 class Authorization(Protocol):
-    def has_permission(self, user: User) -> bool:
-        pass
+    def has_permission(self, user: User) -> bool: ...
 
 
 class UpdateUserAuthorization:
