@@ -2,32 +2,36 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from bookshelf.repositories.in_memory import (
-    InMemoryAuthorRepository,
-    InMemoryBookRepository,
-    InMemoryUserRepository,
+from bookshelf.repositories.relational import (
+    RelationalAuthorRepository,
+    RelationalBookRepository,
+    RelationalUserRepository,
 )
 from bookshelf.repositories.protocols import (
     AuthorRepository,
     BookRepository,
     UserRepository,
 )
+from bookshelf.settings import Settings
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
-in_memory_repo = InMemoryAuthorRepository()
-in_memory_book_repo = InMemoryBookRepository()
-in_memory_user_repo = InMemoryUserRepository()
+
+db_url = Settings().DATABASE_URL
+engine = create_engine(db_url)
+session = Session(engine)
 
 
 def get_author_repository() -> AuthorRepository:
-    return in_memory_repo
+    return RelationalAuthorRepository(session)
 
 
 def get_book_repository() -> BookRepository:
-    return in_memory_book_repo
+    return RelationalBookRepository(session)
 
 
 def get_user_repository() -> UserRepository:
-    return in_memory_user_repo
+    return RelationalUserRepository(session)
 
 
 T_AuthorRepository = Annotated[AuthorRepository, Depends(get_author_repository)]

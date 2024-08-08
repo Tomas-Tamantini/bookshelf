@@ -7,7 +7,7 @@ from bookshelf.repositories.relational.tables import table_registry
 
 @pytest.fixture(scope="session")
 def db_engine():
-    return create_engine("sqlite:///:memory:")
+    return create_engine("sqlite:///test.db")
 
 
 @pytest.fixture

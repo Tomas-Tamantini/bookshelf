@@ -14,10 +14,10 @@ from bookshelf.api.dependencies import (
     get_user_repository,
 )
 from bookshelf.app import app
-from bookshelf.repositories.in_memory import (
-    InMemoryAuthorRepository,
-    InMemoryBookRepository,
-    InMemoryUserRepository,
+from bookshelf.repositories.relational import (
+    RelationalAuthorRepository,
+    RelationalBookRepository,
+    RelationalUserRepository,
 )
 
 
@@ -52,11 +52,10 @@ def client(
 
 
 @pytest.fixture
-def end_to_end_client():
-    # TODO: Use relational DB when implemented
-    author_repository = InMemoryAuthorRepository()
-    book_repository = InMemoryBookRepository()
-    user_repository = InMemoryUserRepository()
+def end_to_end_client(db_session):
+    author_repository = RelationalAuthorRepository(db_session)
+    book_repository = RelationalBookRepository(db_session)
+    user_repository = RelationalUserRepository(db_session)
     with TestClient(app) as client:
         app.dependency_overrides[get_author_repository] = lambda: author_repository
         app.dependency_overrides[get_book_repository] = lambda: book_repository
