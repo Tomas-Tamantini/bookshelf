@@ -10,6 +10,7 @@ jobs:
       JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
       ACCESS_TOKEN_EXPIRATION_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }}
       REFRESH_TOKEN_EXPIRATION_MINUTES: ${{ secrets.REFRESH_TOKEN_EXPIRATION_MINUTES }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Checkout
