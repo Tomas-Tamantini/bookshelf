@@ -16,6 +16,7 @@ python-multipart = "^0.0.9"
 pydantic-settings = "^2.3.4"
 tzdata = "^2024.1"
 psycopg = {extras = ["binary"], version = "^3.2.1"}
+alembic = "^1.13.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
