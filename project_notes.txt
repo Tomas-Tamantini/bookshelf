@@ -35,11 +35,12 @@ Project decisions:
     12/Jul/2024: Extracted most of the functionalities of the in-memory repositories to a base class. Collapsed all repository protocols into one using generic types
     24/Jul/2024: Dockerize even before connecting to a relational database (so just the Dockerfile is needed, not docker compose)
     26/Jul/2024: Implement authorization using dependency injection
+    08/Ago/2024: Implement relational database, still with SQLite
 
     TODO:
         - Implement suggested test cases (https://fastapidozero.dunossauro.com/14/#cenarios-de-teste)
         - Mutation tests
-        - Create relational DB
+        - Create PostgreSQL
         - Create docker compose
         - Create frontend
         - Deploy
