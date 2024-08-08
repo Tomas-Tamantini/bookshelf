@@ -8,3 +8,4 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     ACCESS_TOKEN_EXPIRATION_MINUTES: int
     REFRESH_TOKEN_EXPIRATION_MINUTES: int
+    DATABASE_URL: str
