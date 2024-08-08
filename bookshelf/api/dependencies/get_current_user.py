@@ -8,7 +8,7 @@ from bookshelf.api.dependencies.get_repositories import T_UserRepository
 from bookshelf.api.exceptions import BadTokenError, CredentialsError
 from bookshelf.domain.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 async def get_current_user(
