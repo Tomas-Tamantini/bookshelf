@@ -1,5 +1,8 @@
 # bookshelf
-An API to manage your favorite books. This is the final project for the [FastAPI do Zero](https://fastapidozero.dunossauro.com/) course (see the project requirements [here](https://fastapidozero.dunossauro.com/14/#o-projeto)).
+
+An API to manage your favorite books. This is the final project for the awesome [FastAPI do Zero](https://fastapidozero.dunossauro.com/) course (see the project requirements [here](https://fastapidozero.dunossauro.com/14/#o-projeto)).
+
+See the frontend application [here](https://github.com/Tomas-Tamantini/bookshelf-frontend).
 
 ## How to run the project
 
