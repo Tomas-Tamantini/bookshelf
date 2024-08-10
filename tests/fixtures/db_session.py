@@ -1,13 +1,17 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from testcontainers.postgres import PostgresContainer
 
 from bookshelf.repositories.relational.tables import table_registry
 
 
 @pytest.fixture(scope="session")
 def db_engine():
-    return create_engine("sqlite:///test.db")
+    with PostgresContainer("postgres:16", driver="psycopg") as postgres:
+        engine = create_engine(postgres.get_connection_url())
+        with engine.begin():
+            yield engine
 
 
 @pytest.fixture

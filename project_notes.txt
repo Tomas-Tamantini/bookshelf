@@ -36,11 +36,11 @@ Project decisions:
     24/Jul/2024: Dockerize even before connecting to a relational database (so just the Dockerfile is needed, not docker compose)
     26/Jul/2024: Implement authorization using dependency injection
     08/Ago/2024: Implement relational database, still with SQLite
+    10/Ago/2024: Implement docker compose with PostgreSQL. Also use PostgreSQL in integration/end-to-end tests with TestContainers
 
     TODO:
         - Implement suggested test cases (https://fastapidozero.dunossauro.com/14/#cenarios-de-teste)
         - Mutation tests
-        - Create PostgreSQL
-        - Create docker compose
+        - Clean up end to end tests
         - Create frontend
         - Deploy
