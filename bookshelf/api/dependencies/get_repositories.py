@@ -1,21 +1,20 @@
 from typing import Annotated
 
 from fastapi import Depends
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
-from bookshelf.repositories.relational import (
-    RelationalAuthorRepository,
-    RelationalBookRepository,
-    RelationalUserRepository,
-)
 from bookshelf.repositories.protocols import (
     AuthorRepository,
     BookRepository,
     UserRepository,
 )
+from bookshelf.repositories.relational import (
+    RelationalAuthorRepository,
+    RelationalBookRepository,
+    RelationalUserRepository,
+)
 from bookshelf.settings import Settings
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-
 
 db_url = Settings().DATABASE_URL
 engine = create_engine(db_url)
