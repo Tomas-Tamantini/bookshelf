@@ -30,8 +30,12 @@ testcontainers = "^4.7.2"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.isort]
+profile = "black"
+skip = [".venv", "bookshelf\\repositories\\relational\\migrations"]
+
 [tool.taskipy.tasks]
 run = "fastapi dev bookshelf/app.py"
 test = "pytest"
 coverage = "pytest --cov=bookshelf --cov-report=html"
-sort-imports = "isort . --profile black"
+sort-imports = "isort ."
