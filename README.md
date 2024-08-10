@@ -30,6 +30,20 @@ task run
 task test
 ```
 
+### With Docker
+
+1. Build the image:
+
+```bash
+docker-compose build
+```
+
+2. Run the application:
+
+```bash
+docker-compose up
+```
+
 ## Main tools used in development
 
 - [Python 3.12](https://www.python.org/) as the programming language.
