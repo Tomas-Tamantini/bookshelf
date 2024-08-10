@@ -6,6 +6,8 @@ from freezegun import freeze_time
 
 from bookshelf.settings import Settings
 
+# TODO: Refactor tests - Lots of duplication
+
 
 def _post_author(client, name, token):
     return client.post(
@@ -63,19 +65,22 @@ def test_author_crud(end_to_end_client):
         "Robert C.  martin",
         "Mary Shelley",
     )
+    ids = dict()
     for name in names:
-        _post_author(end_to_end_client, name, token)
+        response = _post_author(end_to_end_client, name, token)
+        ids[response.json()["name"]] = response.json()["id"]
     response = end_to_end_client.get("/authors?name=Ma&limit=2&offset=1")
     assert response.status_code == HTTPStatus.OK
+    expected_author_names = ("robert c martin", "mary shelley")
+    expected_authors = [
+        {"id": ids[name], "name": name} for name in expected_author_names
+    ]
     assert response.json() == {
         "limit": 2,
         "offset": 1,
         "total": 3,
         "name": "ma",
-        "authors": [
-            {"id": 3, "name": "robert c martin"},
-            {"id": 4, "name": "mary shelley"},
-        ],
+        "authors": expected_authors,
     }
 
 
@@ -145,12 +150,14 @@ def test_book_crud(end_to_end_client):
         "Refactoring",
         "Clean Architecture",
     )
+    ids = dict()
     for title in titles:
-        end_to_end_client.post(
+        response = end_to_end_client.post(
             "/books/",
             json={"title": title, "year": 2000, "author_id": author_id},
             headers={"Authorization": f"Bearer {token}"},
         )
+        ids[response.json()["title"]] = response.json()["id"]
     response = end_to_end_client.get("/books?title=Clean&limit=123&offset=1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
@@ -162,7 +169,7 @@ def test_book_crud(end_to_end_client):
         "year": None,
         "books": [
             {
-                "id": 4,
+                "id": ids["clean architecture"],
                 "title": "clean architecture",
                 "year": 2000,
                 "author_id": author_id,
@@ -205,8 +212,9 @@ def test_user_crud(end_to_end_client):
     assert response.json() == {"message": "User deleted"}
     # Get by query parameters
     usernames = ("Alice", "Bob", "Charlie", "Diana", "Alan")
+    ids = dict()
     for username in usernames:
-        end_to_end_client.post(
+        response = end_to_end_client.post(
             "/users/",
             json={
                 "username": username,
@@ -214,6 +222,7 @@ def test_user_crud(end_to_end_client):
                 "password": "password",
             },
         )
+        ids[response.json()["username"]] = response.json()["id"]
     response = end_to_end_client.get("/users?username=Al&limit=2&offset=1")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
@@ -223,7 +232,7 @@ def test_user_crud(end_to_end_client):
         "username": "al",
         "email": None,
         "users": [
-            {"id": 5, "username": "alan", "email": "alan@email.com"},
+            {"id": ids["alan"], "username": "alan", "email": "alan@email.com"},
         ],
     }
 
