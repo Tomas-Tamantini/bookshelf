@@ -31,9 +31,14 @@ class RelationalRepository[Element, ElementWithId, ElementDB, Filters](ABC):
     def _query_table(self) -> Query:
         return self._session.query(self._db_class())
 
-    @staticmethod
-    def _raise_conflict_error(e: IntegrityError) -> None:
-        field = str(e.orig).split(".")[-1].strip()
+    def _is_using_sqlite(self) -> bool:
+        return "sqlite" in self._session.get_bind().dialect.name
+
+    def _raise_conflict_error(self, e: IntegrityError) -> None:
+        if self._is_using_sqlite():
+            field = str(e.orig).split(".")[-1].strip()
+        else:
+            field = str(e.orig).split("(")[1].split(")")[0].strip()
         raise ConflictError(field)
 
     def add(self, element: Element) -> ElementWithId:
