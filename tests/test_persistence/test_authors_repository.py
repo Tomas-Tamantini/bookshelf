@@ -22,6 +22,7 @@ def repository(request):
     return request.getfixturevalue(request.param)
 
 
+@pytest.mark.integration
 def test_adding_author_increments_id(repository):
     auth_1 = repository.add(AuthorCore(name="Author 1"))
     assert auth_1 == Author(id=1, name="Author 1")
@@ -29,6 +30,7 @@ def test_adding_author_increments_id(repository):
     assert auth_2 == Author(id=2, name="Author 2")
 
 
+@pytest.mark.integration
 def test_adding_author_with_existing_name_raises_conflict_error(repository):
     auth_a = AuthorCore(name="Author 1")
     repository.add(auth_a)
@@ -38,24 +40,28 @@ def test_adding_author_with_existing_name_raises_conflict_error(repository):
     assert exc_info.value.field == "name"
 
 
+@pytest.mark.integration
 def test_author_repository_keeps_track_of_ids(repository):
     repository.add(AuthorCore(name="Author 1"))
     assert repository.id_exists(1)
     assert not repository.id_exists(2)
 
 
+@pytest.mark.integration
 def test_author_repository_deletes_author(repository):
     author = repository.add(AuthorCore(name="Author 1"))
     repository.delete(author.id)
     assert not repository.id_exists(author.id)
 
 
+@pytest.mark.integration
 def test_author_repository_updates_author(repository):
     author = repository.add(AuthorCore(name="Original"))
     updated_author = repository.update(author.id, AuthorCore(name="Updated"))
     assert updated_author == Author(id=author.id, name="Updated")
 
 
+@pytest.mark.integration
 def test_author_repository_raises_conflict_error_if_updating_to_existing_name(
     repository,
 ):
@@ -66,12 +72,14 @@ def test_author_repository_raises_conflict_error_if_updating_to_existing_name(
     assert exc_info.value.field == "name"
 
 
+@pytest.mark.integration
 def test_author_repository_gets_author_by_id(repository):
     author = repository.add(AuthorCore(name="Author 1"))
     assert repository.get_by_id(author.id) == author
     assert repository.get_by_id(123) is None
 
 
+@pytest.mark.integration
 def test_author_repository_gets_filtered_and_paginated_authors(repository):
     names = ("abc", "aab", "bba", "ccc", "cab")
     for name in names:

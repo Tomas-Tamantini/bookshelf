@@ -22,6 +22,7 @@ def repository(request):
     return request.getfixturevalue(request.param)
 
 
+@pytest.mark.integration
 def test_adding_user_increments_id(repository, user_core):
     req_1 = user_core(email="u1@mail.com", username="user1")
     user_1 = repository.add(req_1)
@@ -31,6 +32,7 @@ def test_adding_user_increments_id(repository, user_core):
     assert user_2 == User(id=2, **req_2.model_dump())
 
 
+@pytest.mark.integration
 def test_adding_user_with_existing_name_in_repository_raises_conflict_error(
     repository, user_core
 ):
@@ -42,6 +44,7 @@ def test_adding_user_with_existing_name_in_repository_raises_conflict_error(
     assert exc_info.value.field == "username"
 
 
+@pytest.mark.integration
 def test_adding_user_with_existing_email_in_repository_raises_conflict_error(
     repository, user_core
 ):
@@ -53,6 +56,7 @@ def test_adding_user_with_existing_email_in_repository_raises_conflict_error(
     assert exc_info.value.field == "email"
 
 
+@pytest.mark.integration
 def test_user_repository_keeps_track_of_ids(repository, user_core):
     user = user_core()
     repository.add(user)
@@ -60,6 +64,7 @@ def test_user_repository_keeps_track_of_ids(repository, user_core):
     assert not repository.id_exists(2)
 
 
+@pytest.mark.integration
 def test_user_repository_deletes_user(repository, user_core):
     user = user_core()
     user = repository.add(user)
@@ -67,6 +72,7 @@ def test_user_repository_deletes_user(repository, user_core):
     assert not repository.id_exists(user.id)
 
 
+@pytest.mark.integration
 def test_user_repository_updates_user(repository, user_core):
     user = user_core()
     user = repository.add(user)
@@ -76,6 +82,7 @@ def test_user_repository_updates_user(repository, user_core):
     )
 
 
+@pytest.mark.integration
 def test_user_repository_raises_conflict_error_if_updating_to_existing_name(
     repository, user_core
 ):
@@ -87,6 +94,7 @@ def test_user_repository_raises_conflict_error_if_updating_to_existing_name(
     assert exc_info.value.field == "username"
 
 
+@pytest.mark.integration
 def test_user_repository_raises_conflict_error_if_updating_to_existing_email(
     repository, user_core
 ):
@@ -98,6 +106,7 @@ def test_user_repository_raises_conflict_error_if_updating_to_existing_email(
     assert exc_info.value.field == "email"
 
 
+@pytest.mark.integration
 def test_user_repository_gets_user_by_id(repository, user_core):
     user = user_core()
     user = repository.add(user)
@@ -105,6 +114,7 @@ def test_user_repository_gets_user_by_id(repository, user_core):
     assert repository.get_by_id(100) is None
 
 
+@pytest.mark.integration
 def test_user_repository_gets_user_by_email(repository, user_core):
     user = user_core(email="existing@mail.com")
     user = repository.add(user)
@@ -112,6 +122,7 @@ def test_user_repository_gets_user_by_email(repository, user_core):
     assert repository.get_by_email("bad@mail.com") is None
 
 
+@pytest.mark.integration
 def test_user_repository_gets_filtered_users(repository):
     names = ("abc", "aab", "bba", "ccc", "cab")
     for name in names:
